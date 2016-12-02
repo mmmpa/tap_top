@@ -1,12 +1,13 @@
 machine:
   environment:
-    REPO_ROOT: "${HOME}/.go_workspace/src/mmmpa.net/heaper"
+    REPO_ROOT: "${HOME}/.go_workspace/src/mmmpa.net/tap_top"
 
 dependencies:
   pre:
     - mkdir -p ${REPO_ROOT}
     - cp -rf ./* ${REPO_ROOT}
     - go get github.com/tools/godep
+    - cd ${REPO_ROOT} && godep save
 
 test:
   pre:
