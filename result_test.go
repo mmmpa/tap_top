@@ -3,15 +3,11 @@ package taptop
 import (
 	"testing"
 	"io/ioutil"
-	"bufio"
-	"bytes"
 )
 
 func TestScan(t *testing.T) {
 	b, _ := ioutil.ReadFile("./testdata/top_result.log")
-	scanner := bufio.NewScanner(bytes.NewReader(b))
-
-	r := Scan(scanner)
+	r := Scan(ResultRaw(b))
 
 	if r.Tasks.Running != 3 {
 		t.Fail()
@@ -29,7 +25,7 @@ func TestScan(t *testing.T) {
 		t.Fail()
 	}
 
-	if len(r.Rows) != 343 {
+	if len(r.Rows) != 68 {
 		t.Fail()
 	}
 }
