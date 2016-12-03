@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>GoChunko Status Page</title>
+  <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/c3/0.4.11/c3.min.css"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/c3/0.4.11/c3.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/superagent/3.1.0/superagent.min.js"></script>
+  <script src="/built.js"></script>
+</head>
+<body>
+<article class="container">
+  <div id="graphContainer">
+    <div id="tasks"></div>
+    <div id="totalCPU"></div>
+    <div id="totalMemory"></div>
+    <div id="CPUGraph"></div>
+    <div id="memoryGraph"></div>
+  </div>
+
+  <script>
+    new Watcher({
+      size: {{.Size}},
+      wait: {{.Wait}},
+      tasks: 'tasks',
+      totalCPU: 'totalCPU',
+      totalMemory: 'totalMemory',
+      CPUGraph: 'CPUGraph',
+      memoryGraph: 'memoryGraph',
+      initialData: JSON.parse('{{.Correction}}'),
+      names: JSON.parse('{{.Names}}'),
+      realNames: JSON.parse('{{.RealNames}}')
+    }).start()
+  </script>
+</article>
+</body>
+</html>

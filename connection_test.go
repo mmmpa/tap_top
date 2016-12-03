@@ -17,7 +17,7 @@ func TestConnect(t *testing.T) {
 		User: os.Getenv("TAP_TOP_TEST_USER"),
 		Password: os.Getenv("TAP_TOP_TEST_PASSWORD"),
 		Q: q,
-	}.Connect()
+	}.Run()
 
 	for i := 0; i < 2; i++ {
 		s := <-q
@@ -29,7 +29,7 @@ func TestConnect(t *testing.T) {
 
 func TestLocalConnect(t *testing.T) {
 	q := make(chan ResultRaw)
-	go Connector{Q: q}.Connect()
+	go Connector{Q: q}.Run()
 
 	for i := 0; i < 2; i++ {
 		s := <-q

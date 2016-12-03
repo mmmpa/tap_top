@@ -17,7 +17,7 @@ type Connector struct {
 	Q        chan ResultRaw
 }
 
-func (c Connector) Connect() {
+func (c Connector) Run() {
 	if c.Host != "" {
 		c.connectSSH()
 		return
@@ -57,14 +57,9 @@ func (c Connector) connectSSH() {
 }
 
 func (c Connector) connectLocal() {
-	session := exec.Command("top", "-n", "1", "-b")
-
-	var stdoutBuf bytes.Buffer
-	session.Stdout = &stdoutBuf
-
 	for {
-		session.Run()
-		c.Q <- ResultRaw(stdoutBuf.String())
+		o, _ := exec.Command("top", "-n", "1", "-b").Output()
+		c.Q <- ResultRaw(string(o))
 		time.Sleep(1 * time.Second)
 	}
 }

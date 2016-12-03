@@ -9,7 +9,6 @@ import (
 
 type ResultRaw string
 
-
 type Tasks struct {
 	Total    int
 	Running  int
@@ -46,17 +45,17 @@ type Swaps struct {
 type Row interface{}
 
 type Result struct {
-	Tasks
-	CPU
-	Memory
-	Swaps
-	Rows [][]string
+	Tasks `json:"tasks"`
+	CPU `json:"cpu"`
+	Memory `json:"memory"`
+	Swaps `json:"swaps"`
+	Rows [][]string `json:"processes"`
 }
 
 var (
 	pickNumber = regexp.MustCompile(`[0-9\.]+`)
 	pickValues = regexp.MustCompile(`[^ ]+`)
-	rowName = []string{
+	rowNames = []string{
 		"PID",
 		"USER",
 		"PR",
@@ -70,7 +69,7 @@ var (
 		"TIME+",
 		"COMMAND",
 	}
-	rowRealName = []string{
+	rowRealNames = []string{
 		"PID",
 		"User",
 		"Priority",
