@@ -50,8 +50,9 @@ type Result struct {
 	CPU `json:"cpu"`
 	Memory `json:"memory"`
 	Swaps `json:"swaps"`
-	Rows [][]string `json:"processes"`
-	Time int `json:"time"`
+	Rows         [][]string `json:"processes"`
+	RowPositions map[string]int `json:"rowPositions"`
+	Time         int `json:"time"`
 }
 
 var (
@@ -193,9 +194,13 @@ func Scan(raw ResultRaw) Result {
 
 	// Processes Header
 	scanner.Scan()
+	result.RowPositions = map[string]int{}
+	picked := pickValues.FindAllStringSubmatch(scanner.Text(), -1)
+	for i, n := range picked {
+		result.RowPositions[n[0]] = i
+	}
 
 	// Processes
-
 	for scanner.Scan() {
 		result.Rows = pickToRow(scanner.Text(), result.Rows)
 	}

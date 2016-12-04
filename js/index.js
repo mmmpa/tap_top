@@ -48,15 +48,16 @@ class Watcher {
 
     this.timeList = []
 
-    this.conf.initialData.forEach(({ time, processes }, i) => {
+    this.conf.initialData.forEach(({ time, processes, rowPositions }, i) => {
+      console.log(rowPositions)
       this.timeList.push(time * 1000 + '')
 
       if (!processes) {
         return {}
       }
       processes.forEach((process) => {
-        let pid = process[keyMap.PID]
-        let cmd = process[keyMap.Command]
+        let pid = process[rowPositions.PID]
+        let cmd = process[rowPositions.COMMAND]
         if (cmd.indexOf('/top') != -1 || cmd === 'top') {
           return
         }
@@ -86,16 +87,16 @@ class Watcher {
         .get('/r')
         .set('Accept', 'application/json')
         .end((err, res) => {
-          let time = res.body.time * 1000 + ''
-          this.timeList.shift()
-          this.timeList.push(time)
-          this.store.add(res.body.processes)
+          let { processes, rowPositions } = res.body
 
-          this.cpuChart.reload(this.store.column('PerCPU'))
-          this.memoryChart.reload(this.store.column('PerMemory'))
-
-          this.cpuChart.shiftTime(this.timeList.concat())
-          this.memoryChart.shiftTime(this.timeList.concat())
+          setTimeout(()=> {
+            this.cpuChart.add(processes, rowPositions.PID, rowPositions.COMMAND, rowPositions['%CPU'])
+            this.cpuChart.shiftTime(this.timeList.concat())
+          }, 1)
+          setTimeout(()=> {
+            this.memoryChart.add(processes, rowPositions.PID, rowPositions.COMMAND, rowPositions['%MEM'])
+            this.memoryChart.shiftTime(this.timeList.concat())
+          }, 2)
         })
     }, Configure.wait * 1000)
   }
@@ -199,14 +200,14 @@ class Chart {
         grouped: false
       },
       axis: {
-        x:{
+        x: {
           show: false
         },
         y: {
           max: 100,
           tick: {
             format: function (d) {
-              if(d > 100) {
+              if (d > 100) {
                 return ''
               }
               return d + ' %';
@@ -225,6 +226,28 @@ class Chart {
 
   shiftTime (timeList) {
     // this.chart.x(timeList)
+  }
+
+  add (processes, pidPosition, commandPosition, targetPosition) {
+    let columns = []
+    processes.forEach((process) => {
+      let pid = process[pidPosition]
+      let cmd = process[commandPosition]
+      let value = process[targetPosition]
+      if (cmd.indexOf('/top') != -1 || cmd === 'top') {
+        return
+      }
+
+      let cols = this.chart.data.values(`${pid}:${cmd}`)
+      if (cols) {
+        cols.shift()
+        cols.push(value)
+        cols.unshift(`${pid}:${cmd}`)
+        columns.push(cols)
+      }
+    })
+
+    this.chart.load({ columns })
   }
 
   reload (dataList) {

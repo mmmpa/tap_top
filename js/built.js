@@ -87,16 +87,18 @@ var Watcher = function () {
 
       this.conf.initialData.forEach(function (_ref2, i) {
         var time = _ref2.time,
-            processes = _ref2.processes;
+            processes = _ref2.processes,
+            rowPositions = _ref2.rowPositions;
 
+        console.log(rowPositions);
         _this.timeList.push(time * 1000 + '');
 
         if (!processes) {
           return {};
         }
         processes.forEach(function (process) {
-          var pid = process[keyMap.PID];
-          var cmd = process[keyMap.Command];
+          var pid = process[rowPositions.PID];
+          var cmd = process[rowPositions.COMMAND];
           if (cmd.indexOf('/top') != -1 || cmd === 'top') {
             return;
           }
@@ -125,16 +127,19 @@ var Watcher = function () {
 
       setInterval(function () {
         req.get('/r').set('Accept', 'application/json').end(function (err, res) {
-          var time = res.body.time * 1000 + '';
-          _this2.timeList.shift();
-          _this2.timeList.push(time);
-          _this2.store.add(res.body.processes);
+          var _res$body = res.body,
+              processes = _res$body.processes,
+              rowPositions = _res$body.rowPositions;
 
-          _this2.cpuChart.reload(_this2.store.column('PerCPU'));
-          _this2.memoryChart.reload(_this2.store.column('PerMemory'));
 
-          _this2.cpuChart.shiftTime(_this2.timeList.concat());
-          _this2.memoryChart.shiftTime(_this2.timeList.concat());
+          setTimeout(function () {
+            _this2.cpuChart.add(processes, rowPositions.PID, rowPositions.COMMAND, rowPositions['%CPU']);
+            _this2.cpuChart.shiftTime(_this2.timeList.concat());
+          }, 1);
+          setTimeout(function () {
+            _this2.memoryChart.add(processes, rowPositions.PID, rowPositions.COMMAND, rowPositions['%MEM']);
+            _this2.memoryChart.shiftTime(_this2.timeList.concat());
+          }, 2);
         });
       }, Configure.wait * 1000);
     }
@@ -304,6 +309,31 @@ var Chart = function () {
     key: 'shiftTime',
     value: function shiftTime(timeList) {
       // this.chart.x(timeList)
+    }
+  }, {
+    key: 'add',
+    value: function add(processes, pidPosition, commandPosition, targetPosition) {
+      var _this6 = this;
+
+      var columns = [];
+      processes.forEach(function (process) {
+        var pid = process[pidPosition];
+        var cmd = process[commandPosition];
+        var value = process[targetPosition];
+        if (cmd.indexOf('/top') != -1 || cmd === 'top') {
+          return;
+        }
+
+        var cols = _this6.chart.data.values(pid + ':' + cmd);
+        if (cols) {
+          cols.shift();
+          cols.push(value);
+          cols.unshift(pid + ':' + cmd);
+          columns.push(cols);
+        }
+      });
+
+      this.chart.load({ columns: columns });
     }
   }, {
     key: 'reload',
