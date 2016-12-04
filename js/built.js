@@ -42,7 +42,8 @@ var Watcher = function () {
         memoryGraph = _ref.memoryGraph,
         initialData = _ref.initialData,
         names = _ref.names,
-        realNames = _ref.realNames;
+        realNames = _ref.realNames,
+        min = _ref.min;
 
     _classCallCheck(this, Watcher);
 
@@ -54,15 +55,19 @@ var Watcher = function () {
       memoryGraph: memoryGraph,
       initialData: initialData,
       names: names,
-      realNames: realNames
+      realNames: realNames,
+      min: min
     };
 
     Configure.wait = wait;
     Configure.size = size;
+    Configure.min = min;
     Configure.keyMap = {};
     realNames.forEach(function (n, i) {
       Configure.keyMap[n] = i;
     });
+
+    this.store = new DataStore();
   }
 
   _createClass(Watcher, [{
@@ -73,13 +78,18 @@ var Watcher = function () {
   }, {
     key: 'initialize',
     value: function initialize() {
+      var _this = this;
+
       var keyMap = Configure.keyMap;
 
 
-      var store = new DataStore();
+      this.timeList = [];
 
       this.conf.initialData.forEach(function (_ref2, i) {
-        var processes = _ref2.processes;
+        var time = _ref2.time,
+            processes = _ref2.processes;
+
+        _this.timeList.push(time * 1000 + '');
 
         if (!processes) {
           return {};
@@ -91,23 +101,42 @@ var Watcher = function () {
             return;
           }
 
-          store.process(pid, cmd).addInto(process, i);
+          _this.store.process(pid, cmd).addInto(process, i);
         });
       });
 
-      new Chart({
+      this.cpuChart = new Chart({
         id: this.conf.CPUGraph,
-        dataList: store.column('PerCPU')
+        dataList: this.store.column('PerCPU'),
+        timeList: this.timeList.concat()
       });
+
+      this.memoryChart = new Chart({
+        id: this.conf.memoryGraph,
+        dataList: this.store.column('PerMemory'),
+        timeList: this.timeList.concat()
+      }).stack();
+      this.work();
     }
   }, {
-    key: 'loop',
-    value: function loop() {
+    key: 'work',
+    value: function work() {
+      var _this2 = this;
+
       setInterval(function () {
         req.get('/r').set('Accept', 'application/json').end(function (err, res) {
-          console.log(res);
+          var time = res.body.time * 1000 + '';
+          _this2.timeList.shift();
+          _this2.timeList.push(time);
+          _this2.store.add(res.body.processes);
+
+          _this2.cpuChart.reload(_this2.store.column('PerCPU'));
+          _this2.memoryChart.reload(_this2.store.column('PerMemory'));
+
+          _this2.cpuChart.shiftTime(_this2.timeList.concat());
+          _this2.memoryChart.shiftTime(_this2.timeList.concat());
         });
-      }, this.conf.wait * 1000);
+      }, Configure.wait * 1000);
     }
   }]);
 
@@ -139,6 +168,24 @@ var DataStore = function () {
 
       return this.store[pid] = new DataSet({ pid: pid, cmd: cmd });
     }
+  }, {
+    key: 'add',
+    value: function add(processes) {
+      var _this3 = this;
+
+      var keyMap = Configure.keyMap;
+
+
+      processes.forEach(function (process) {
+        var pid = process[keyMap.PID];
+        var cmd = process[keyMap.Command];
+        if (cmd.indexOf('/top') != -1 || cmd === 'top') {
+          return;
+        }
+
+        _this3.process(pid, cmd).add(process);
+      });
+    }
   }]);
 
   return DataStore;
@@ -154,6 +201,9 @@ var DataSet = function () {
     this.pid = pid;
     this.cmd = cmd;
     this.store = [];
+    this.total = 0;
+
+    // 持ちうる key の分だけ配列を用意する
     for (var i in Configure.keyMap) {
       this.store.push(Configure.dataArray);
     }
@@ -167,19 +217,31 @@ var DataSet = function () {
   }, {
     key: 'add',
     value: function add(process) {
-      var _this = this;
+      var _this4 = this;
 
       process.forEach(function (v, i) {
-        _this.store[i].push(v);
+        _this4.store[i].shift();
+        _this4.store[i].push(v);
       });
     }
+
+    // プロセスの各値が入った配列が引数となるので、
+    // それを y 軸上に配置する
+
   }, {
     key: 'addInto',
     value: function addInto(process, position) {
-      var _this2 = this;
+      var _this5 = this;
 
       process.forEach(function (v, i) {
-        _this2.store[i][position] = v;
+        var n = +v;
+        if (n < Configure.min) {
+          n = 0;
+        }
+        _this5.store[i][position] = n;
+        if (!isNaN(n)) {
+          _this5.total += n;
+        }
       });
     }
   }]);
@@ -187,46 +249,86 @@ var DataSet = function () {
   return DataSet;
 }();
 
-var Chart = function Chart(_ref4) {
-  var id = _ref4.id,
-      dataList = _ref4.dataList;
+var Chart = function () {
+  function Chart(_ref4) {
+    var id = _ref4.id,
+        dataList = _ref4.dataList,
+        timeList = _ref4.timeList;
 
-  _classCallCheck(this, Chart);
+    _classCallCheck(this, Chart);
 
-  console.log(dataList);
-  var columns = dataList;
-  for (var i in dataList) {
-    columns.push(dataList[i]);
+    var columns = dataList;
+    timeList.unshift('x');
+    // columns.push(timeList)
+
+    this.chart = c3.generate({
+      bindto: '#' + id,
+      size: {
+        height: 800
+      },
+      data: {
+        columns: columns
+      },
+      legend: {
+        show: false
+      },
+      tooltip: {
+        grouped: false
+      },
+      axis: {
+        x: {
+          show: false
+        },
+        y: {
+          max: 100,
+          tick: {
+            format: function format(d) {
+              if (d > 100) {
+                return '';
+              }
+              return d + ' %';
+            }
+          }
+        }
+      },
+      point: {
+        show: false
+      },
+      transition: {
+        duration: 0
+      }
+    });
   }
 
-  this.chart = c3.generate({
-    bindto: '#' + id,
-    size: {
-      height: 800
-    },
-    data: {
-      columns: columns
-    },
-    axis: {
-      x: {
-        type: 'category',
-        categories: [],
-        tick: {
-          rotate: 90,
-          multiline: false
-        },
-        height: 100
-      }
-    },
-    point: {
-      show: false
-    },
-    transition: {
-      duration: 0
+  _createClass(Chart, [{
+    key: 'shiftTime',
+    value: function shiftTime(timeList) {
+      // this.chart.x(timeList)
     }
-  });
-};
+  }, {
+    key: 'reload',
+    value: function reload(dataList) {
+      this.chart.load({
+        columns: dataList
+      });
+    }
+  }, {
+    key: 'stack',
+    value: function stack() {
+      this.chart.groups([this.chart.data().map(function (d) {
+        return d.id;
+      })]);
+
+      return this;
+    }
+  }]);
+
+  return Chart;
+}();
 
 window.Watcher = Watcher;
+
+var d = new Date();
+d.getHours();
 
 },{}]},{},[1]);

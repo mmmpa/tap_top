@@ -15,7 +15,7 @@ class Configure {
 }
 
 class Watcher {
-  constructor ({ size, wait, tasks, totalCPU, totalMemory, CPUGraph, memoryGraph, initialData, names, realNames }) {
+  constructor ({ size, wait, tasks, totalCPU, totalMemory, CPUGraph, memoryGraph, initialData, names, realNames, min }) {
     this.conf = {
       tasks,
       totalCPU,
@@ -24,15 +24,19 @@ class Watcher {
       memoryGraph,
       initialData,
       names,
-      realNames
+      realNames,
+      min
     }
 
     Configure.wait = wait
     Configure.size = size
+    Configure.min = min
     Configure.keyMap = {}
     realNames.forEach((n, i) => {
       Configure.keyMap[n] = i
     })
+
+    this.store = new DataStore()
   }
 
   start () {
@@ -42,9 +46,11 @@ class Watcher {
   initialize () {
     let { keyMap } = Configure
 
-    let store = new DataStore()
+    this.timeList = []
 
-    this.conf.initialData.forEach(({ processes }, i) => {
+    this.conf.initialData.forEach(({ time, processes }, i) => {
+      this.timeList.push(time * 1000 + '')
+
       if (!processes) {
         return {}
       }
@@ -55,25 +61,43 @@ class Watcher {
           return
         }
 
-        store.process(pid, cmd).addInto(process, i)
+        this.store.process(pid, cmd).addInto(process, i)
       })
     })
 
-    new Chart({
+
+    this.cpuChart = new Chart({
       id: this.conf.CPUGraph,
-      dataList: store.column('PerCPU')
+      dataList: this.store.column('PerCPU'),
+      timeList: this.timeList.concat()
     })
+
+    this.memoryChart = new Chart({
+      id: this.conf.memoryGraph,
+      dataList: this.store.column('PerMemory'),
+      timeList: this.timeList.concat()
+    }).stack()
+    this.work()
   }
 
-  loop () {
-    setInterval(function () {
+  work () {
+    setInterval(() => {
       req
         .get('/r')
         .set('Accept', 'application/json')
-        .end(function (err, res) {
-          console.log(res)
+        .end((err, res) => {
+          let time = res.body.time * 1000 + ''
+          this.timeList.shift()
+          this.timeList.push(time)
+          this.store.add(res.body.processes)
+
+          this.cpuChart.reload(this.store.column('PerCPU'))
+          this.memoryChart.reload(this.store.column('PerMemory'))
+
+          this.cpuChart.shiftTime(this.timeList.concat())
+          this.memoryChart.shiftTime(this.timeList.concat())
         })
-    }, this.conf.wait * 1000)
+    }, Configure.wait * 1000)
   }
 }
 
@@ -97,6 +121,20 @@ class DataStore {
 
     return this.store[pid] = new DataSet({ pid, cmd })
   }
+
+  add (processes) {
+    let { keyMap } = Configure
+
+    processes.forEach((process) => {
+      let pid = process[keyMap.PID]
+      let cmd = process[keyMap.Command]
+      if (cmd.indexOf('/top') != -1 || cmd === 'top') {
+        return
+      }
+
+      this.process(pid, cmd).add(process)
+    })
+  }
 }
 
 class DataSet {
@@ -104,6 +142,9 @@ class DataSet {
     this.pid = pid
     this.cmd = cmd
     this.store = []
+    this.total = 0
+
+    // 持ちうる key の分だけ配列を用意する
     for (let i in Configure.keyMap) {
       this.store.push(Configure.dataArray)
     }
@@ -115,25 +156,33 @@ class DataSet {
 
   add (process) {
     process.forEach((v, i) => {
+      this.store[i].shift()
       this.store[i].push(v)
     })
   }
 
+  // プロセスの各値が入った配列が引数となるので、
+  // それを y 軸上に配置する
   addInto (process, position) {
     process.forEach((v, i) => {
-      this.store[i][position] = v
+      let n = +v
+      if (n < Configure.min) {
+        n = 0
+      }
+      this.store[i][position] = n
+      if (!isNaN(n)) {
+        this.total += n
+      }
     })
   }
 }
 
 
 class Chart {
-  constructor ({ id, dataList }) {
-    console.log(dataList)
+  constructor ({ id, dataList, timeList }) {
     let columns = dataList
-    for (let i in dataList) {
-      columns.push(dataList[i])
-    }
+    timeList.unshift('x')
+    // columns.push(timeList)
 
     this.chart = c3.generate({
       bindto: `#${id}`,
@@ -143,15 +192,26 @@ class Chart {
       data: {
         columns
       },
+      legend: {
+        show: false
+      },
+      tooltip: {
+        grouped: false
+      },
       axis: {
-        x: {
-          type: 'category',
-          categories: [],
+        x:{
+          show: false
+        },
+        y: {
+          max: 100,
           tick: {
-            rotate: 90,
-            multiline: false
-          },
-          height: 100
+            format: function (d) {
+              if(d > 100) {
+                return ''
+              }
+              return d + ' %';
+            }
+          }
         },
       },
       point: {
@@ -162,7 +222,25 @@ class Chart {
       }
     });
   }
+
+  shiftTime (timeList) {
+    // this.chart.x(timeList)
+  }
+
+  reload (dataList) {
+    this.chart.load({
+      columns: dataList
+    })
+  }
+
+  stack () {
+    this.chart.groups([this.chart.data().map((d) => d.id)])
+
+    return this
+  }
 }
 
 window.Watcher = Watcher
 
+let d = new Date()
+d.getHours()

@@ -5,6 +5,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type ResultRaw string
@@ -50,6 +51,7 @@ type Result struct {
 	Memory `json:"memory"`
 	Swaps `json:"swaps"`
 	Rows [][]string `json:"processes"`
+	Time int `json:"time"`
 }
 
 var (
@@ -127,7 +129,9 @@ func pickToF(text string) []float32 {
 
 func Scan(raw ResultRaw) Result {
 	scanner := bufio.NewScanner(strings.NewReader(string(raw)))
-	result := Result{}
+	result := Result{
+		Time: int(time.Now().Unix()),
+	}
 
 	// header
 	scanner.Scan()
