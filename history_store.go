@@ -33,4 +33,3 @@ func Retrieve(path string, container interface{}) error {
 
 	return json.Unmarshal(b, container)
 }
-

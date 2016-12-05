@@ -41,6 +41,7 @@ func (s Server) Run() {
 	}
 
 	http.HandleFunc("/built.js", s.returnJavaScriptFile)
+	http.HandleFunc("/built.css", s.returnCSSFile)
 	http.HandleFunc("/r", s.returnLastResult)
 	http.HandleFunc("/", s.renderIndex)
 	log.Println("server")
@@ -72,5 +73,9 @@ func (s Server) returnLastResult(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s Server) returnJavaScriptFile(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "js/built.js")
+	http.ServeFile(w, r, "assets/built.js")
+}
+
+func (s Server) returnCSSFile(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "assets/built.css")
 }
