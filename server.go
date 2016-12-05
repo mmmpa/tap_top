@@ -79,3 +79,4 @@ func (s Server) returnJavaScriptFile(w http.ResponseWriter, r *http.Request) {
 func (s Server) returnCSSFile(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "assets/built.css")
 }
+

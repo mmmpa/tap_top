@@ -50,6 +50,7 @@ var ChartComponent = function (_React$Component) {
 
       this.state = {
         data: this.initializeData(this.props.data),
+        xLabels: (this.props.xLabels || []).concat(),
         stored: this.clone(this.props.data),
         wait: 0,
         innerHub: new _events.EventEmitter()
@@ -98,7 +99,7 @@ var ChartComponent = function (_React$Component) {
     value: function receive(e) {
       switch (e.type) {
         case 'add':
-          this.add(e.data);
+          this.add(e.data, e.xLabel);
         default:
         //
       }
@@ -116,7 +117,7 @@ var ChartComponent = function (_React$Component) {
     }
   }, {
     key: 'add',
-    value: function add(newData) {
+    value: function add(newData, xLabel) {
       var _this3 = this;
 
       // 既存のデータを全トレースして、新しいデータになければ 0 あればそれを追加する
@@ -154,22 +155,34 @@ var ChartComponent = function (_React$Component) {
         _data.push({ id: id, name: name, data: _data });
       }
 
-      if (this.state.wait > 0) {
-        this.setState({ stored: data, wait: this.state.wait - 1 });
-      } else {
-        this.setState({ data: data, stored: this.clone(data), wait: waitCount });
+      var newLabels = this.state.xLabels;
+      if (xLabel) {
+        newLabels = newLabels.concat();
+        newLabels.shift();
+        newLabels.push(xLabel);
       }
+
+      this.setState({ data: data, xLabels: newLabels, stored: this.clone(data), wait: waitCount });
     }
   }, {
     key: 'render',
     value: function render() {
       var conf = this.props.conf;
+      var _props$conf = this.props.conf,
+          w = _props$conf.w,
+          h = _props$conf.h,
+          yLabelWidth = _props$conf.yLabelWidth,
+          xLabelHeight = _props$conf.xLabelHeight;
 
       conf.innerHub = this.state.innerHub;
 
       return React.createElement(
         'div',
-        { className: 'ps-chart ps-container' },
+        {
+          className: 'ps-chart ps-container',
+          style: { width: w + yLabelWidth, height: h + xLabelHeight } },
+        React.createElement(YLabelContainer, { conf: conf }),
+        React.createElement(XLabelContainer, { conf: conf, labels: this.state.xLabels }),
         React.createElement(
           Box,
           { conf: conf },
@@ -186,6 +199,211 @@ var ChartComponent = function (_React$Component) {
 
 exports.default = ChartComponent;
 
+var YLabelContainer = function () {
+  function YLabelContainer() {
+    _classCallCheck(this, YLabelContainer);
+  }
+
+  _createClass(YLabelContainer, [{
+    key: 'render',
+    value: function render() {
+      var _props$conf2 = this.props.conf,
+          w = _props$conf2.w,
+          h = _props$conf2.h,
+          yLabelWidth = _props$conf2.yLabelWidth,
+          yMax = _props$conf2.yMax,
+          yLabelStep = _props$conf2.yLabelStep;
+
+
+      return React.createElement(
+        'div',
+        { className: 'ps-chart ps-y-label-container', style: {
+            top: 0,
+            left: 0
+          } },
+        this.labels
+      );
+    }
+  }, {
+    key: 'labels',
+    get: function get() {
+      var conf = this.props.conf;
+      var _props$conf3 = this.props.conf,
+          w = _props$conf3.w,
+          h = _props$conf3.h,
+          yLabelWidth = _props$conf3.yLabelWidth,
+          yMax = _props$conf3.yMax,
+          yLabelStep = _props$conf3.yLabelStep;
+
+      var ls = [];
+      var l = Math.round(yMax / yLabelStep);
+      var yStep = h / (yMax / yLabelStep);
+      for (var i = 0; i <= l; i++) {
+        ls.push(React.createElement(YLabel, {
+          conf: conf,
+          label: i * yLabelStep,
+          top: h - yStep * i
+        }));
+      }
+
+      return ls;
+    }
+  }]);
+
+  return YLabelContainer;
+}();
+
+var XLabelContainer = function (_React$Component2) {
+  _inherits(XLabelContainer, _React$Component2);
+
+  function XLabelContainer() {
+    _classCallCheck(this, XLabelContainer);
+
+    return _possibleConstructorReturn(this, (XLabelContainer.__proto__ || Object.getPrototypeOf(XLabelContainer)).apply(this, arguments));
+  }
+
+  _createClass(XLabelContainer, [{
+    key: 'render',
+    value: function render() {
+      var _props$conf4 = this.props.conf,
+          w = _props$conf4.w,
+          h = _props$conf4.h,
+          yLabelWidth = _props$conf4.yLabelWidth,
+          yMax = _props$conf4.yMax,
+          yLabelStep = _props$conf4.yLabelStep,
+          xLabelHeight = _props$conf4.xLabelHeight;
+
+
+      return React.createElement(
+        'div',
+        { className: 'ps-chart ps-x-label-container', style: {
+            top: h,
+            left: yLabelWidth,
+            width: w,
+            height: xLabelHeight
+          } },
+        this.labels
+      );
+    }
+  }, {
+    key: 'labels',
+    get: function get() {
+      var conf = this.props.conf;
+      var _props$conf5 = this.props.conf,
+          w = _props$conf5.w,
+          h = _props$conf5.h,
+          yLabelWidth = _props$conf5.yLabelWidth,
+          yMax = _props$conf5.yMax,
+          yLabelStep = _props$conf5.yLabelStep,
+          xSize = _props$conf5.xSize,
+          xLabelFormat = _props$conf5.xLabelFormat;
+
+      var ls = [];
+      var l = Math.round(yMax / yLabelStep);
+      var xStep = w / (xSize - 1);
+      for (var i = 0; i < xSize; i++) {
+        var xl = this.props.labels[i] || 0;
+        ls.push(React.createElement(XLabel, {
+          conf: conf,
+          label: xLabelFormat ? xLabelFormat(xl) : xl,
+          left: xStep * i,
+          top: 0
+        }));
+      }
+
+      return ls;
+    }
+  }]);
+
+  return XLabelContainer;
+}(React.Component);
+
+var YLabel = function () {
+  function YLabel() {
+    _classCallCheck(this, YLabel);
+  }
+
+  _createClass(YLabel, [{
+    key: 'render',
+    value: function render() {
+      var _props = this.props,
+          top = _props.top,
+          label = _props.label;
+      var _props$conf6 = this.props.conf,
+          yLabelWidth = _props$conf6.yLabelWidth,
+          yLabelFormat = _props$conf6.yLabelFormat;
+
+
+      return React.createElement(
+        'div',
+        { className: 'ps-chart ps-y-label', style: {
+            top: top,
+            width: yLabelWidth
+          } },
+        yLabelFormat ? yLabelFormat(label) : label
+      );
+    }
+  }]);
+
+  return YLabel;
+}();
+
+var XLabel = function (_React$Component3) {
+  _inherits(XLabel, _React$Component3);
+
+  function XLabel() {
+    _classCallCheck(this, XLabel);
+
+    return _possibleConstructorReturn(this, (XLabel.__proto__ || Object.getPrototypeOf(XLabel)).apply(this, arguments));
+  }
+
+  _createClass(XLabel, [{
+    key: 'componentDidMount',
+    value: function componentDidMount() {
+      this.reset();
+    }
+  }, {
+    key: 'reset',
+    value: function reset() {
+      var _this6 = this;
+
+      if (this.props.centering) {
+        setTimeout(function () {
+          _this6.setState({
+            offset: -_this6.innerLabel.clientWidth / 2
+          });
+        }, 0);
+      }
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      var _this7 = this;
+
+      var _props2 = this.props,
+          left = _props2.left,
+          label = _props2.label;
+
+      return React.createElement(
+        'div',
+        { className: 'ps-chart ps-x-label', style: {
+            left: left,
+            transform: 'rotateZ(' + (this.props.conf.xLabelRotate || 0) + 'deg)'
+          } },
+        React.createElement(
+          'div',
+          { className: 'ps-chart ps-x-label-inner', ref: function ref(l) {
+              return _this7.innerLabel = l;
+            }, style: { left: this.state.offset } },
+          label
+        )
+      );
+    }
+  }]);
+
+  return XLabel;
+}(React.Component);
+
 var Box = function () {
   function Box() {
     _classCallCheck(this, Box);
@@ -194,16 +412,24 @@ var Box = function () {
   _createClass(Box, [{
     key: 'render',
     value: function render() {
-      var _props$conf = this.props.conf,
-          w = _props$conf.w,
-          h = _props$conf.h;
+      var conf = this.props.conf;
+      var w = conf.w,
+          h = conf.h,
+          yLabelWidth = conf.yLabelWidth,
+          xLabelHeight = conf.xLabelHeight;
 
       var width = w + 'px';
       var height = h + 'px';
       var viewBox = '0 0 ' + w + ' ' + h;
       return React.createElement(
         'svg',
-        _extends({ className: 'ps-chart ps-line-box', x: '0px', y: '0px' }, { width: width, height: height, viewBox: viewBox }),
+        _extends({
+          className: 'ps-chart ps-line-box',
+          style: { top: 0, left: yLabelWidth },
+          x: '0px',
+          y: '0px'
+        }, { width: width, height: height, viewBox: viewBox }),
+        React.createElement(BoxBG, { conf: conf }),
         this.props.children
       );
     }
@@ -211,6 +437,91 @@ var Box = function () {
 
   return Box;
 }();
+
+var BoxBG = function (_React$Component4) {
+  _inherits(BoxBG, _React$Component4);
+
+  function BoxBG() {
+    _classCallCheck(this, BoxBG);
+
+    return _possibleConstructorReturn(this, (BoxBG.__proto__ || Object.getPrototypeOf(BoxBG)).apply(this, arguments));
+  }
+
+  _createClass(BoxBG, [{
+    key: 'shouldComponentUpdate',
+    value: function shouldComponentUpdate() {
+      return false;
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      return React.createElement(
+        'g',
+        null,
+        this.horizontalLines,
+        this.verticalLines
+      );
+    }
+  }, {
+    key: 'horizontalLines',
+    get: function get() {
+      var conf = this.props.conf;
+      var _props$conf7 = this.props.conf,
+          w = _props$conf7.w,
+          h = _props$conf7.h,
+          yLabelWidth = _props$conf7.yLabelWidth,
+          yMax = _props$conf7.yMax,
+          yLabelStep = _props$conf7.yLabelStep;
+
+      var ls = [];
+      var l = Math.round(yMax / yLabelStep);
+      var yStep = h / (yMax / yLabelStep);
+      for (var i = 0; i <= l; i++) {
+        var y = yStep * i;
+        var a = {
+          x1: 0,
+          x2: w,
+          y1: y,
+          y2: y
+        };
+        ls.push(React.createElement('line', _extends({}, a, { style: 'stroke:#ecf0f1; stroke-width:1' })));
+      }
+
+      return ls;
+    }
+  }, {
+    key: 'verticalLines',
+    get: function get() {
+      var _props$conf8 = this.props.conf,
+          w = _props$conf8.w,
+          h = _props$conf8.h,
+          yLabelWidth = _props$conf8.yLabelWidth,
+          yMax = _props$conf8.yMax,
+          yLabelStep = _props$conf8.yLabelStep,
+          xSize = _props$conf8.xSize,
+          xLabelFormat = _props$conf8.xLabelFormat;
+
+      var ls = [];
+      var l = Math.round(yMax / yLabelStep);
+      var xStep = w / (xSize - 1);
+
+      for (var i = 0; i < xSize; i++) {
+        var x = xStep * i;
+        var a = {
+          x1: x,
+          x2: x,
+          y1: 0,
+          y2: h
+        };
+        ls.push(React.createElement('line', _extends({}, a, { style: 'stroke:#ecf0f1; stroke-width:1' })));
+      }
+
+      return ls;
+    }
+  }]);
+
+  return BoxBG;
+}(React.Component);
 
 // y 位置は高さから逆算
 
@@ -233,7 +544,7 @@ var Line = function () {
       var w = this.props.conf.w;
 
 
-      return w / length * position;
+      return w / (length - 1) * position;
     }
   }, {
     key: 'computeY',
@@ -246,20 +557,20 @@ var Line = function () {
   }, {
     key: 'render',
     value: function render() {
-      var _this4 = this;
+      var _this9 = this;
 
       var data = this.props.data.data;
 
 
       var onMouseOver = function onMouseOver(e) {
-        _this4.props.conf.innerHub.emit('line:over', {
-          name: _this4.props.data.name,
-          color: _this4.state.color,
+        _this9.props.conf.innerHub.emit('line:over', {
+          name: _this9.props.data.name,
+          color: _this9.state.color,
           e: e
         });
       };
 
-      var pre = {};
+      var pre = void 0;
       var l = data.length;
 
       return React.createElement(
@@ -268,13 +579,13 @@ var Line = function () {
         data.map(function (d, i) {
 
           var now = {
-            x1: pre.x,
-            y1: pre.y,
-            x2: _this4.computeX(i, l),
-            y2: _this4.computeY(d)
+            x1: pre ? pre.x : 0,
+            y1: pre ? pre.y : 0,
+            x2: _this9.computeX(i, l),
+            y2: _this9.computeY(d)
           };
 
-          var re = pre.x ? React.createElement('line', _extends({}, now, { style: 'stroke:' + _this4.state.color + ';stroke-width:1' })) : null;
+          var re = pre ? React.createElement('line', _extends({}, now, { style: 'stroke:' + _this9.state.color + ';stroke-width:1' })) : null;
 
           pre = { x: now.x2, y: now.y2 };
           return re;
@@ -309,6 +620,8 @@ var _hub = require('./utils/hub');
 var _hub2 = _interopRequireDefault(_hub);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -391,7 +704,8 @@ var Watcher = function () {
   }, {
     key: 'initialize',
     value: function initialize() {
-      var _this = this;
+      var _this = this,
+          _ref3;
 
       var keyMap = Configure.keyMap;
 
@@ -422,32 +736,57 @@ var Watcher = function () {
       (0, _preact.render)(React.createElement(_chart2.default, {
         name: 'PerCPU',
         data: this.store.column('PerCPU'),
+        xLabels: this.timeList,
         conf: {
           w: 800,
-          h: 300
+          h: 300,
+          xLabelHeight: 70,
+          xSize: Configure.size,
+          xLabelRotate: 90,
+          yLabelWidth: 50,
+          yMax: 200,
+          yLabelStep: 20,
+          yLabelFormat: function yLabelFormat(v) {
+            return v + ' %';
+          },
+          xLabelFormat: function xLabelFormat(v) {
+            return dateString(v);
+          }
         } }), document.querySelector('#' + this.conf.CPUGraph));
 
       (0, _preact.render)(React.createElement(_chart2.default, {
         name: 'PerMemory',
         stack: true,
         data: this.store.column('PerMemory'),
-        conf: {
+        xLabels: this.timeList,
+        conf: (_ref3 = {
           w: 800,
-          h: 600
-        } }), document.querySelector('#' + this.conf.memoryGraph));
+          h: 600,
+          xLabelHeight: 70,
+          xLabelRotate: 0,
+          xSize: Configure.size
+        }, _defineProperty(_ref3, 'xLabelRotate', 90), _defineProperty(_ref3, 'yLabelWidth', 50), _defineProperty(_ref3, 'yMax', 100), _defineProperty(_ref3, 'yLabelStep', 5), _defineProperty(_ref3, 'yLabelFormat', function yLabelFormat(v) {
+          return v + ' %';
+        }), _defineProperty(_ref3, 'xLabelFormat', function xLabelFormat(v) {
+          return dateString(v);
+        }), _ref3) }), document.querySelector('#' + this.conf.memoryGraph));
 
       setInterval(function () {
         req.get('/r').set('Accept', 'application/json').end(function (err, res) {
           var _res$body = res.body,
               processes = _res$body.processes,
-              rowPositions = _res$body.rowPositions;
+              rowPositions = _res$body.rowPositions,
+              time = _res$body.time;
 
+          time *= 1000;
           var picked = pick(processes, rowPositions.PID, rowPositions.COMMAND, [rowPositions['%CPU'], rowPositions['%MEM']]);
           _hub2.default.emit('PerCPU', {
-            type: 'add', data: picked[rowPositions['%CPU']]
+            type: 'add', data: picked[rowPositions['%CPU']],
+            xLabel: time
           });
           _hub2.default.emit('PerMemory', {
-            type: 'add', data: picked[rowPositions['%MEM']]
+            type: 'add', data: picked[rowPositions['%MEM']],
+            xLabel: time
           });
         });
       }, Configure.wait * 1000);
@@ -456,6 +795,15 @@ var Watcher = function () {
 
   return Watcher;
 }();
+
+function dateString(unixTime) {
+  var d = new Date(+unixTime);
+  return double(d.getHours()) + ':' + double(d.getMinutes()) + ':' + double(d.getSeconds());
+}
+
+function double(n) {
+  return (n < 10 ? '0' : '') + n;
+}
 
 function pick(processes, idPosition, namePosition, valuePositions) {
   var re = {};
@@ -528,9 +876,9 @@ var DataStore = function () {
 }();
 
 var DataSet = function () {
-  function DataSet(_ref3) {
-    var pid = _ref3.pid,
-        cmd = _ref3.cmd;
+  function DataSet(_ref4) {
+    var pid = _ref4.pid,
+        cmd = _ref4.cmd;
 
     _classCallCheck(this, DataSet);
 

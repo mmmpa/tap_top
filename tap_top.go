@@ -4,7 +4,7 @@ import "time"
 
 func Run() {
 	q := make(chan ResultRaw)
-	c := NewCorrector(60)
+	c := NewCorrector(30)
 
 	// TODO(mmmpa): to support to change log size after storing
 	Retrieve("result.log", &c.Correction)

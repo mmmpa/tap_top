@@ -1,6 +1,36 @@
 @charset "UTF-8";
 body {
   font-family: Quicksand, 游ゴシック体, "Yu Gothic", YuGothic, "ヒラギノ角ゴシック Pro", "Hiragino Kaku Gothic Pro", メイリオ, Meiryo, Osaka, "ＭＳ Ｐゴシック", "MS PGothic", sans-serif;
-  background: #eee; }
+  background: #ecf0f1; }
+
+.ps-chart {
+  font-family: "Cutive Mono"; }
+  .ps-chart.ps-container {
+    position: relative; }
+  .ps-chart.ps-line-box, .ps-chart.ps-y-label-container, .ps-chart.ps-x-label-container, .ps-chart.ps-y-label, .ps-chart.ps-x-label, .ps-chart.ps-x-label-inner {
+    box-sizing: border-box;
+    position: absolute; }
+  .ps-chart.ps-y-label {
+    height: 0;
+    line-height: 0;
+    text-align: right;
+    vertical-align: middle;
+    padding-right: 10px;
+    white-space: nowrap; }
+  .ps-chart.ps-x-label-container {
+    padding-top: 10px; }
+  .ps-chart.ps-x-label {
+    white-space: nowrap;
+    vertical-align: middle;
+    width: 10px;
+    transform-origin: left top; }
+  .ps-chart.ps-x-label-inner {
+    line-height: 0;
+    height: 0; }
+  .ps-chart.ps-line-box {
+    overflow: hidden;
+    border-radius: 3px;
+    border: 1px solid #ccc;
+    background: #fff; }
 
 /*# sourceMappingURL=built.css.map */
