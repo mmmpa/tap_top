@@ -509,27 +509,25 @@ var Line = function () {
         });
       };
 
-      var pre = void 0;
-      var l = line.length;
-
       return React.createElement(
         'g',
         _extends({ id: this.props.data.name + this.props.data.id }, { onMouseOver: onMouseOver }, { key: this.props.data.name }),
-        line.map(function (d, i) {
-
-          var now = {
-            x1: pre ? pre.x : 0,
-            y1: pre ? pre.y : 0,
-            x2: _this8.computeX(i, l),
-            y2: _this8.computeY(d)
-          };
-
-          var re = pre ? React.createElement('line', _extends({}, now, { style: 'stroke:' + _this8.props.data.color + ';stroke-width:1' })) : null;
-
-          pre = { x: now.x2, y: now.y2 };
-          return re;
-        })
+        React.createElement('path', { fill: 'none', d: this.lineValue, style: 'stroke:' + this.props.data.color + ';stroke-width:1' })
       );
+    }
+  }, {
+    key: 'lineValue',
+    get: function get() {
+      var line = this.props.line;
+
+      var d = 'M 0 ' + this.computeY(line[0]) + ' ';
+
+      var l = line.length;
+      for (var i = 1; i < l; i++) {
+        d += 'L ' + this.computeX(i, l) + ' ' + this.computeY(line[i]);
+      }
+
+      return d;
     }
   }]);
 
