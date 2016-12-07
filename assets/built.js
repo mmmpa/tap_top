@@ -486,10 +486,12 @@ var Line = function () {
   }, {
     key: 'computeY',
     value: function computeY(value) {
-      var h = this.props.conf.h;
+      var _props$conf8 = this.props.conf,
+          h = _props$conf8.h,
+          yMax = _props$conf8.yMax;
 
 
-      return h - h * (value / 100);
+      return h - h * (value / yMax);
     }
   }, {
     key: 'render',
@@ -512,7 +514,7 @@ var Line = function () {
 
       return React.createElement(
         'g',
-        _extends({ onMouseOver: onMouseOver }, { key: this.props.data.name }),
+        _extends({ id: this.props.data.name + this.props.data.id }, { onMouseOver: onMouseOver }, { key: this.props.data.name }),
         line.map(function (d, i) {
 
           var now = {
@@ -551,6 +553,8 @@ var _chart = require('./components/chart');
 var _chart2 = _interopRequireDefault(_chart);
 
 var _events = require('events');
+
+var _colorWheel = require('./utils/color-wheel');
 
 var _hub = require('./utils/hub');
 
@@ -646,14 +650,62 @@ var Watcher = function () {
 
       this.timeList = [];
       var processList = {};
+      var memoryList = {
+        1: { id: 1, color: '#bdc3c7', name: 'free', data: [] },
+        2: { id: 2, color: '#e74c3c', name: 'used', data: [] },
+        3: { id: 3, color: '#9b59b6', name: 'buffers', data: [] }
+      };
+
+      var CPUList = {
+        1: { id: 1, color: '#e74c3c', name: 'User', data: [] },
+        2: { id: 2, color: '#3498db', name: 'System', data: [] },
+        3: { id: 3, color: '#1abc9c', name: 'Nice', data: [] },
+        4: { id: 4, color: '#bdc3c7', name: 'Idle', data: [] },
+        5: { id: 5, name: 'IOWait', data: [] },
+        6: { id: 6, name: 'HardwareInterrupt', data: [] },
+        7: { id: 7, name: 'SoftwareInterrupt', data: [] },
+        8: { id: 8, name: 'StolenTime', data: [] }
+      };
 
       this.conf.initialData.forEach(function (_ref2, i) {
-        var time = _ref2.time,
+        var memory = _ref2.memory,
+            cpu = _ref2.cpu,
+            time = _ref2.time,
             processes = _ref2.processes,
             rowPositions = _ref2.rowPositions;
 
         // manage time
         _this.timeList.push(time * 1000 + '');
+
+        var Total = memory.Total,
+            Used = memory.Used,
+            Free = memory.Free,
+            Buffers = memory.Buffers;
+
+
+        _this.totalMemory = +Total;
+        memoryList[1].data.push(Math.round(+Free / _this.totalMemory * 1000) / 10);
+        memoryList[2].data.push(Math.round(+Used / _this.totalMemory * 1000) / 10);
+        memoryList[3].data.push(Math.round(+Buffers / _this.totalMemory * 1000) / 10);
+
+        var User = cpu.User,
+            System = cpu.System,
+            Nice = cpu.Nice,
+            Idle = cpu.Idle,
+            IOWait = cpu.IOWait,
+            HardwareInterrupt = cpu.HardwareInterrupt,
+            SoftwareInterrupt = cpu.SoftwareInterrupt,
+            StolenTime = cpu.StolenTime;
+
+
+        CPUList[1].data.push(User);
+        CPUList[2].data.push(System);
+        CPUList[3].data.push(Nice);
+        CPUList[4].data.push(Idle);
+        CPUList[5].data.push(IOWait);
+        CPUList[6].data.push(HardwareInterrupt);
+        CPUList[7].data.push(SoftwareInterrupt);
+        CPUList[8].data.push(StolenTime);
 
         if (!processes) {
           return {};
@@ -678,14 +730,56 @@ var Watcher = function () {
         });
       });
 
-      console.log(processList, pickRow('%CPU', processList));
+      (0, _preact.render)(React.createElement(_chart2.default, {
+        name: 'totalCPU',
+        data: CPUList,
+        xLabels: this.timeList,
+        conf: {
+          stack: true,
+          w: 400,
+          h: 300,
+          xLabelHeight: 70,
+          xSize: Configure.size,
+          xLabelRotate: 90,
+          yLabelWidth: 50,
+          yMax: 100,
+          yLabelStep: 20,
+          yLabelFormat: function yLabelFormat(v) {
+            return v + ' %';
+          },
+          xLabelFormat: function xLabelFormat(v) {
+            return dateString(v);
+          }
+        } }), document.querySelector('#' + this.conf.totalCPU));
+
+      (0, _preact.render)(React.createElement(_chart2.default, {
+        name: 'totalMemory',
+        data: memoryList,
+        xLabels: this.timeList,
+        conf: {
+          stack: true,
+          w: 400,
+          h: 300,
+          xLabelHeight: 70,
+          xSize: Configure.size,
+          xLabelRotate: 90,
+          yLabelWidth: 50,
+          yMax: 100,
+          yLabelStep: 20,
+          yLabelFormat: function yLabelFormat(v) {
+            return v + ' %';
+          },
+          xLabelFormat: function xLabelFormat(v) {
+            return dateString(v);
+          }
+        } }), document.querySelector('#' + this.conf.totalMemory));
 
       (0, _preact.render)(React.createElement(_chart2.default, {
         name: 'PerCPU',
         data: pickRow('%CPU', processList),
         xLabels: this.timeList,
         conf: {
-          w: 800,
+          w: 400,
           h: 300,
           xLabelHeight: 70,
           xSize: Configure.size,
@@ -707,7 +801,7 @@ var Watcher = function () {
         xLabels: this.timeList,
         conf: {
           stack: true,
-          w: 800,
+          w: 400,
           h: 600,
           xLabelHeight: 70,
           xSize: Configure.size,
@@ -728,7 +822,9 @@ var Watcher = function () {
           var _res$body = res.body,
               processes = _res$body.processes,
               rowPositions = _res$body.rowPositions,
-              time = _res$body.time;
+              time = _res$body.time,
+              cpu = _res$body.cpu,
+              memory = _res$body.memory;
 
           time *= 1000;
           var picked = pick(processes, rowPositions.PID, rowPositions.COMMAND, [rowPositions['%CPU'], rowPositions['%MEM']]);
@@ -738,6 +834,41 @@ var Watcher = function () {
           });
           _hub2.default.emit('PerMemory', {
             type: 'add', data: picked[rowPositions['%MEM']],
+            xLabel: time
+          });
+
+          var memoryList = {
+            1: { id: 1, color: '#bdc3c7', name: 'free', value: Math.round(memory.Free / _this.totalMemory * 1000) / 10 },
+            2: { id: 2, color: '#e74c3c', name: 'used', value: Math.round(memory.Used / _this.totalMemory * 1000) / 10 },
+            3: { id: 3, color: '#9b59b6', name: 'buffers', value: Math.round(memory.Buffers / _this.totalMemory * 1000) / 10 }
+          };
+
+          _hub2.default.emit('totalMemory', {
+            type: 'add', data: memoryList,
+            xLabel: time
+          });
+
+          var CPUList = {
+            1: { id: 1, name: 'User', value: cpu.User },
+            2: { id: 2, name: 'System', value: cpu.System },
+            3: { id: 3, name: 'Nice', value: cpu.Nice },
+            4: { id: 4, name: 'Idle', value: cpu.Idle },
+            5: { id: 5, name: 'IOWait', value: cpu.IOWait },
+            6: {
+              id: 6,
+              name: 'HardwareInterrupt',
+              value: cpu.HardwareInterrupt
+            },
+            7: {
+              id: 7,
+              name: 'SoftwareInterrupt',
+              value: cpu.SoftwareInterrupt
+            },
+            8: { id: 8, name: 'StolenTime', value: cpu.StolenTime }
+          };
+
+          _hub2.default.emit('totalCPU', {
+            type: 'add', data: CPUList,
             xLabel: time
           });
         });
@@ -840,7 +971,7 @@ var DataStore = function () {
 
 window.Watcher = Watcher;
 
-},{"./components/chart":1,"./utils/hub":6,"events":7,"preact":8}],3:[function(require,module,exports){
+},{"./components/chart":1,"./utils/color-wheel":5,"./utils/hub":6,"events":7,"preact":8}],3:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -935,6 +1066,10 @@ var ChartData = function () {
         data.push(value);
 
         var _row = new _chatRow2.default({ id: id, name: name, data: data });
+
+        if (_row.total === 0) {
+          continue;
+        }
 
         if (this.isStack) {
           var previousLine = void 0;
@@ -1040,7 +1175,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.textToColor = textToColor;
 exports.numToColor = numToColor;
-var colors = ['#0086AB', '#0098A6', '#00A199', '#009C7F', '#009767', '#009250', '#059C30', '#0BA60B', '#3BB111', '#6FBB18', '#A4C520', '#B6D11B', '#CBDC15', '#E4E80F', '#F3EB08', '#FFE600', '#FBDA02', '#F8CF05', '#F4C107', '#F1B709', '#EDAD0B', '#E58611', '#DE6316', '#D6431B', '#CF2620', '#C7243A', '#C42245', '#C01F52', '#BD1D5D', '#B91B67', '#B61972', '#AF1C74', '#A81F76', '#A12275', '#9A2475', '#932674', '#953095', '#7F3B97', '#6C469A', '#5F519C', '#5D639E', '#4D5FA3', '#3B60A8', '#2962AD', '#156BB2', '#007AB7', '#007CB5', '#0080B2', '#0081B0', '#0085AD'];
+var colors = exports.colors = ['#0086AB', '#0098A6', '#00A199', '#009C7F', '#009767', '#009250', '#059C30', '#0BA60B', '#3BB111', '#6FBB18', '#A4C520', '#B6D11B', '#CBDC15', '#E4E80F', '#F3EB08', '#FFE600', '#FBDA02', '#F8CF05', '#F4C107', '#F1B709', '#EDAD0B', '#E58611', '#DE6316', '#D6431B', '#CF2620', '#C7243A', '#C42245', '#C01F52', '#BD1D5D', '#B91B67', '#B61972', '#AF1C74', '#A81F76', '#A12275', '#9A2475', '#932674', '#953095', '#7F3B97', '#6C469A', '#5F519C', '#5D639E', '#4D5FA3', '#3B60A8', '#2962AD', '#156BB2', '#007AB7', '#007CB5', '#0080B2', '#0081B0', '#0085AD'];
 var colorLength = colors.length;
 
 function textToColor(s) {

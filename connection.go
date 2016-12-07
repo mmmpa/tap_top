@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"time"
 	"os/exec"
+	"bufio"
 )
 
 type Connector struct {
@@ -57,9 +58,22 @@ func (c Connector) connectSSH() {
 }
 
 func (c Connector) connectLocal() {
-	for {
-		o, _ := exec.Command("top", "-n", "1", "-b").Output()
-		c.Q <- ResultRaw(string(o))
-		time.Sleep(1 * time.Second)
+	cmd := exec.Command("top", "-d", "2", "-b")
+	stdout, _ := cmd.StdoutPipe()
+	cmd.Start()
+
+	scanner := bufio.NewScanner(stdout)
+
+	store := ""
+	for scanner.Scan() {
+		t := scanner.Text()
+		if len(t) != 0 && t[0:1] == "t" {
+			if len(store) > 0 {
+				c.Q <- ResultRaw(store)
+				store = ""
+			}
+		}else{
+			store += scanner.Text() + "\n"
+		}
 	}
 }

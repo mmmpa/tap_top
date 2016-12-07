@@ -135,7 +135,7 @@ func Scan(raw ResultRaw) Result {
 	}
 
 	// header
-	scanner.Scan()
+	// scanner.Scan()
 
 	// Tasks
 	scanner.Scan()
@@ -202,7 +202,10 @@ func Scan(raw ResultRaw) Result {
 
 	// Processes
 	for scanner.Scan() {
-		result.Rows = pickToRow(scanner.Text(), result.Rows)
+		t := scanner.Text()
+		if len(t) > 0 {
+			result.Rows = pickToRow(scanner.Text(), result.Rows)
+		}
 	}
 
 	return result
