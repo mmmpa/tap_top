@@ -736,7 +736,7 @@ var Watcher = function () {
         xLabels: this.timeList,
         conf: {
           stack: true,
-          w: 400,
+          w: 600,
           h: 300,
           xLabelHeight: 70,
           xSize: Configure.size,
@@ -758,7 +758,7 @@ var Watcher = function () {
         xLabels: this.timeList,
         conf: {
           stack: true,
-          w: 400,
+          w: 600,
           h: 300,
           xLabelHeight: 70,
           xSize: Configure.size,
@@ -779,7 +779,7 @@ var Watcher = function () {
         data: pickRow('%CPU', processList),
         xLabels: this.timeList,
         conf: {
-          w: 400,
+          w: 600,
           h: 300,
           xLabelHeight: 70,
           xSize: Configure.size,
@@ -801,7 +801,7 @@ var Watcher = function () {
         xLabels: this.timeList,
         conf: {
           stack: true,
-          w: 400,
+          w: 600,
           h: 600,
           xLabelHeight: 70,
           xSize: Configure.size,
