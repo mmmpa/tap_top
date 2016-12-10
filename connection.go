@@ -58,7 +58,7 @@ func (c Connector) connectSSH() {
 }
 
 func (c Connector) connectLocal() {
-	cmd := exec.Command("top", "-d", "2", "-b")
+	cmd := exec.Command("top", "-d", "1", "-b")
 	stdout, _ := cmd.StdoutPipe()
 	cmd.Start()
 

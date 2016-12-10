@@ -7,21 +7,15 @@ import (
 	"time"
 )
 
-func StoreInterval(interval time.Duration, path string, get func() interface{}) {
+func StoreInterval(interval time.Duration, path string, get func() []byte) {
 	for {
 		time.Sleep(interval)
 		Store(path, get())
 	}
 }
 
-func Store(path string, data interface{}) error {
-	j, err := json.Marshal(data)
-
-	if err != nil {
-		return err
-	}
-
-	return ioutil.WriteFile(path, j, os.ModePerm)
+func Store(path string, data []byte) error {
+	return ioutil.WriteFile(path, data, os.ModePerm)
 }
 
 func Retrieve(path string, container interface{}) error {

@@ -221,7 +221,9 @@ func pickToRow(raw string, container [][]string) [][]string {
 
 	row := make([]string, 12, 12)
 	for i, c := range cols {
-		row[i] = c[0]
+		if i <= 11{
+			row[i] = c[0]
+		}
 	}
 
 	return append(container, row)

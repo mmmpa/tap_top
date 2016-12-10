@@ -1,5 +1,7 @@
 package taptop
 
+import "encoding/json"
+
 type Corrector struct {
 	Size       int
 	Correction []Result
@@ -18,10 +20,12 @@ func (c *Corrector) Correct(raw ResultRaw) {
 }
 
 func (c *Corrector) GetLatest() Result {
-	if c.Correction == nil {
+	if c.Correction == nil || c.Pos == 0 {
 		return Result{}
 	}
+
 	p := c.Pos - 1
+
 	if p < c.Size {
 		return c.Correction[p]
 	}
@@ -41,4 +45,8 @@ func (c *Corrector) Read() []Result {
 	}
 
 	return correction
+}
+
+func (c *Corrector) Marshal() ([]byte, error) {
+	return json.Marshal(c.Correction)
 }

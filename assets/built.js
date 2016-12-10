@@ -118,6 +118,11 @@ var ChartComponent = function (_React$Component) {
           Box,
           { conf: conf },
           this.lines
+        ),
+        React.createElement(
+          RowItemContainer,
+          { conf: conf },
+          this.rowItems
         )
       );
     }
@@ -135,7 +140,22 @@ var ChartComponent = function (_React$Component) {
           ls.push(React.createElement(Line, _extends({ line: row.data, data: row }, { conf: conf })));
         }
       }
-      return ls;
+      return ls.reverse();
+    }
+  }, {
+    key: 'rowItems',
+    get: function get() {
+      var conf = this.props.conf;
+      var yLabelFormat = conf.yLabelFormat;
+
+      var items = [];
+      for (var i in this.state.data.data) {
+        var data = this.state.data.data[i];
+        var value = data.data[data.data.length - 1];
+        yLabelFormat && (value = yLabelFormat(value));
+        items.push(React.createElement(RowItem, { value: value, data: data, conf: conf }));
+      }
+      return items.reverse();
     }
   }]);
 
@@ -143,6 +163,78 @@ var ChartComponent = function (_React$Component) {
 }(React.Component);
 
 exports.default = ChartComponent;
+
+var RowItemContainer = function () {
+  function RowItemContainer() {
+    _classCallCheck(this, RowItemContainer);
+  }
+
+  _createClass(RowItemContainer, [{
+    key: 'render',
+    value: function render() {
+      var _props$conf2 = this.props.conf,
+          w = _props$conf2.w,
+          h = _props$conf2.h,
+          yLabelWidth = _props$conf2.yLabelWidth,
+          xLabelHeight = _props$conf2.xLabelHeight,
+          rowItemWidth = _props$conf2.rowItemWidth;
+
+      return React.createElement(
+        'div',
+        { className: 'ps-chart ps-row-item-container', style: {
+            top: 0,
+            left: w + xLabelHeight,
+            width: rowItemWidth,
+            height: h + xLabelHeight
+          } },
+        this.props.children
+      );
+    }
+  }]);
+
+  return RowItemContainer;
+}();
+
+var RowItem = function () {
+  function RowItem() {
+    _classCallCheck(this, RowItem);
+  }
+
+  _createClass(RowItem, [{
+    key: 'render',
+    value: function render() {
+      var _props$data = this.props.data,
+          name = _props$data.name,
+          color = _props$data.color;
+      var value = this.props.value;
+
+      return React.createElement(
+        'div',
+        { className: 'ps-chart ps-row-item' },
+        React.createElement(
+          'div',
+          { className: 'ps-chart ps-row-item-color', style: {
+              color: color
+
+            } },
+          '\u25A0'
+        ),
+        React.createElement(
+          'div',
+          { className: 'ps-chart ps-row-item-name' },
+          name
+        ),
+        React.createElement(
+          'div',
+          { className: 'ps-chart ps-row-item-value' },
+          value
+        )
+      );
+    }
+  }]);
+
+  return RowItem;
+}();
 
 var YLabelContainer = function () {
   function YLabelContainer() {
@@ -152,12 +244,12 @@ var YLabelContainer = function () {
   _createClass(YLabelContainer, [{
     key: 'render',
     value: function render() {
-      var _props$conf2 = this.props.conf,
-          w = _props$conf2.w,
-          h = _props$conf2.h,
-          yLabelWidth = _props$conf2.yLabelWidth,
-          yMax = _props$conf2.yMax,
-          yLabelStep = _props$conf2.yLabelStep;
+      var _props$conf3 = this.props.conf,
+          w = _props$conf3.w,
+          h = _props$conf3.h,
+          yLabelWidth = _props$conf3.yLabelWidth,
+          yMax = _props$conf3.yMax,
+          yLabelStep = _props$conf3.yLabelStep;
 
 
       return React.createElement(
@@ -173,12 +265,12 @@ var YLabelContainer = function () {
     key: 'labels',
     get: function get() {
       var conf = this.props.conf;
-      var _props$conf3 = this.props.conf,
-          w = _props$conf3.w,
-          h = _props$conf3.h,
-          yLabelWidth = _props$conf3.yLabelWidth,
-          yMax = _props$conf3.yMax,
-          yLabelStep = _props$conf3.yLabelStep;
+      var _props$conf4 = this.props.conf,
+          w = _props$conf4.w,
+          h = _props$conf4.h,
+          yLabelWidth = _props$conf4.yLabelWidth,
+          yMax = _props$conf4.yMax,
+          yLabelStep = _props$conf4.yLabelStep;
 
       var ls = [];
       var l = Math.round(yMax / yLabelStep);
@@ -210,13 +302,13 @@ var XLabelContainer = function (_React$Component2) {
   _createClass(XLabelContainer, [{
     key: 'render',
     value: function render() {
-      var _props$conf4 = this.props.conf,
-          w = _props$conf4.w,
-          h = _props$conf4.h,
-          yLabelWidth = _props$conf4.yLabelWidth,
-          yMax = _props$conf4.yMax,
-          yLabelStep = _props$conf4.yLabelStep,
-          xLabelHeight = _props$conf4.xLabelHeight;
+      var _props$conf5 = this.props.conf,
+          w = _props$conf5.w,
+          h = _props$conf5.h,
+          yLabelWidth = _props$conf5.yLabelWidth,
+          yMax = _props$conf5.yMax,
+          yLabelStep = _props$conf5.yLabelStep,
+          xLabelHeight = _props$conf5.xLabelHeight;
 
 
       return React.createElement(
@@ -234,14 +326,14 @@ var XLabelContainer = function (_React$Component2) {
     key: 'labels',
     get: function get() {
       var conf = this.props.conf;
-      var _props$conf5 = this.props.conf,
-          w = _props$conf5.w,
-          h = _props$conf5.h,
-          yLabelWidth = _props$conf5.yLabelWidth,
-          yMax = _props$conf5.yMax,
-          yLabelStep = _props$conf5.yLabelStep,
-          xSize = _props$conf5.xSize,
-          xLabelFormat = _props$conf5.xLabelFormat;
+      var _props$conf6 = this.props.conf,
+          w = _props$conf6.w,
+          h = _props$conf6.h,
+          yLabelWidth = _props$conf6.yLabelWidth,
+          yMax = _props$conf6.yMax,
+          yLabelStep = _props$conf6.yLabelStep,
+          xSize = _props$conf6.xSize,
+          xLabelFormat = _props$conf6.xLabelFormat;
 
       var ls = [];
       var l = Math.round(yMax / yLabelStep);
@@ -274,9 +366,9 @@ var YLabel = function () {
       var _props = this.props,
           top = _props.top,
           label = _props.label;
-      var _props$conf6 = this.props.conf,
-          yLabelWidth = _props$conf6.yLabelWidth,
-          yLabelFormat = _props$conf6.yLabelFormat;
+      var _props$conf7 = this.props.conf,
+          yLabelWidth = _props$conf7.yLabelWidth,
+          yLabelFormat = _props$conf7.yLabelFormat;
 
 
       return React.createElement(
@@ -436,14 +528,14 @@ var BoxBG = function (_React$Component4) {
   }, {
     key: 'verticalLines',
     get: function get() {
-      var _props$conf7 = this.props.conf,
-          w = _props$conf7.w,
-          h = _props$conf7.h,
-          yLabelWidth = _props$conf7.yLabelWidth,
-          yMax = _props$conf7.yMax,
-          yLabelStep = _props$conf7.yLabelStep,
-          xSize = _props$conf7.xSize,
-          xLabelFormat = _props$conf7.xLabelFormat;
+      var _props$conf8 = this.props.conf,
+          w = _props$conf8.w,
+          h = _props$conf8.h,
+          yLabelWidth = _props$conf8.yLabelWidth,
+          yMax = _props$conf8.yMax,
+          yLabelStep = _props$conf8.yLabelStep,
+          xSize = _props$conf8.xSize,
+          xLabelFormat = _props$conf8.xLabelFormat;
 
       var ls = [];
       var l = Math.round(yMax / yLabelStep);
@@ -481,14 +573,14 @@ var Line = function () {
       var w = this.props.conf.w;
 
 
-      return w / (length - 1) * position;
+      return (w + 1) / (length - 1) * position;
     }
   }, {
     key: 'computeY',
     value: function computeY(value) {
-      var _props$conf8 = this.props.conf,
-          h = _props$conf8.h,
-          yMax = _props$conf8.yMax;
+      var _props$conf9 = this.props.conf,
+          h = _props$conf9.h,
+          yMax = _props$conf9.yMax;
 
 
       return h - h * (value / yMax);
@@ -498,13 +590,14 @@ var Line = function () {
     value: function render() {
       var _this8 = this;
 
+      var stack = this.props.conf.stack;
       var line = this.props.line;
 
 
       var onMouseOver = function onMouseOver(e) {
         _this8.props.conf.innerHub.emit('line:over', {
           name: _this8.props.data.name,
-          color: _this8.state.color,
+          color: _this8.props.data.color,
           e: e
         });
       };
@@ -512,19 +605,30 @@ var Line = function () {
       return React.createElement(
         'g',
         _extends({ id: this.props.data.name + this.props.data.id }, { onMouseOver: onMouseOver }, { key: this.props.data.name }),
-        React.createElement('path', { fill: 'none', d: this.lineValue, style: 'stroke:' + this.props.data.color + ';stroke-width:1' })
+        React.createElement('path', { fill: stack ? this.props.data.color : 'none', d: this.lineValue, style: 'stroke:' + this.props.data.color + ';stroke-width:1' })
       );
     }
   }, {
     key: 'lineValue',
     get: function get() {
+      var _props$conf10 = this.props.conf,
+          stack = _props$conf10.stack,
+          w = _props$conf10.w,
+          h = _props$conf10.h;
       var line = this.props.line;
 
-      var d = 'M 0 ' + this.computeY(line[0]) + ' ';
 
+      var start = -1;
+      var end = w + 1;
+
+      var d = 'M ' + start + ' ' + this.computeY(line[0]) + ' ';
       var l = line.length;
       for (var i = 1; i < l; i++) {
         d += 'L ' + this.computeX(i, l) + ' ' + this.computeY(line[i]);
+      }
+
+      if (stack) {
+        d += 'L ' + end + ' ' + h + ' L ' + start + ' ' + h;
       }
 
       return d;
@@ -649,16 +753,16 @@ var Watcher = function () {
       this.timeList = [];
       var processList = {};
       var memoryList = {
-        1: { id: 1, color: '#bdc3c7', name: 'free', data: [] },
-        2: { id: 2, color: '#e74c3c', name: 'used', data: [] },
-        3: { id: 3, color: '#9b59b6', name: 'buffers', data: [] }
+        // 1: { id: 1, color: '#bdc3c7', name: 'free', data: [] },
+        2: { id: 2, name: 'used', data: [] },
+        3: { id: 3, name: 'buffers', data: [] }
       };
 
       var CPUList = {
-        1: { id: 1, color: '#e74c3c', name: 'User', data: [] },
-        2: { id: 2, color: '#3498db', name: 'System', data: [] },
-        3: { id: 3, color: '#1abc9c', name: 'Nice', data: [] },
-        4: { id: 4, color: '#bdc3c7', name: 'Idle', data: [] },
+        1: { id: 1, name: 'User', data: [] },
+        2: { id: 2, name: 'System', data: [] },
+        3: { id: 3, name: 'Nice', data: [] },
+        // 4: { id: 4, color: '#bdc3c7', name: 'Idle', data: [] },
         5: { id: 5, name: 'IOWait', data: [] },
         6: { id: 6, name: 'HardwareInterrupt', data: [] },
         7: { id: 7, name: 'SoftwareInterrupt', data: [] },
@@ -682,7 +786,7 @@ var Watcher = function () {
 
 
         _this.totalMemory = +Total;
-        memoryList[1].data.push(Math.round(+Free / _this.totalMemory * 1000) / 10);
+        // memoryList[1].data.push(Math.round(+Free / this.totalMemory * 1000) / 10)
         memoryList[2].data.push(Math.round(+Used / _this.totalMemory * 1000) / 10);
         memoryList[3].data.push(Math.round(+Buffers / _this.totalMemory * 1000) / 10);
 
@@ -699,7 +803,7 @@ var Watcher = function () {
         CPUList[1].data.push(User);
         CPUList[2].data.push(System);
         CPUList[3].data.push(Nice);
-        CPUList[4].data.push(Idle);
+        // CPUList[4].data.push(Idle)
         CPUList[5].data.push(IOWait);
         CPUList[6].data.push(HardwareInterrupt);
         CPUList[7].data.push(SoftwareInterrupt);
@@ -742,6 +846,7 @@ var Watcher = function () {
           yLabelWidth: 50,
           yMax: 100,
           yLabelStep: 20,
+          rowItemWidth: 200,
           yLabelFormat: function yLabelFormat(v) {
             return v + ' %';
           },
@@ -764,6 +869,7 @@ var Watcher = function () {
           yLabelWidth: 50,
           yMax: 100,
           yLabelStep: 20,
+          rowItemWidth: 200,
           yLabelFormat: function yLabelFormat(v) {
             return v + ' %';
           },
@@ -785,6 +891,7 @@ var Watcher = function () {
           yLabelWidth: 50,
           yMax: 200,
           yLabelStep: 20,
+          rowItemWidth: 200,
           yLabelFormat: function yLabelFormat(v) {
             return v + ' %';
           },
@@ -807,6 +914,7 @@ var Watcher = function () {
           yLabelWidth: 50,
           yMax: 100,
           yLabelStep: 5,
+          rowItemWidth: 200,
           yLabelFormat: function yLabelFormat(v) {
             return v + ' %';
           },
@@ -836,7 +944,7 @@ var Watcher = function () {
           });
 
           var memoryList = {
-            1: { id: 1, color: '#bdc3c7', name: 'free', value: Math.round(memory.Free / _this.totalMemory * 1000) / 10 },
+            // 1: { id: 1, color: '#bdc3c7', name: 'free', value: Math.round(memory.Free / this.totalMemory * 1000) / 10 },
             2: { id: 2, color: '#e74c3c', name: 'used', value: Math.round(memory.Used / _this.totalMemory * 1000) / 10 },
             3: { id: 3, color: '#9b59b6', name: 'buffers', value: Math.round(memory.Buffers / _this.totalMemory * 1000) / 10 }
           };
@@ -850,7 +958,7 @@ var Watcher = function () {
             1: { id: 1, name: 'User', value: cpu.User },
             2: { id: 2, name: 'System', value: cpu.System },
             3: { id: 3, name: 'Nice', value: cpu.Nice },
-            4: { id: 4, name: 'Idle', value: cpu.Idle },
+            // 4: { id: 4, name: 'Idle', value: cpu.Idle },
             5: { id: 5, name: 'IOWait', value: cpu.IOWait },
             6: {
               id: 6,
@@ -1174,6 +1282,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.textToColor = textToColor;
 exports.numToColor = numToColor;
 var colors = exports.colors = ['#0086AB', '#0098A6', '#00A199', '#009C7F', '#009767', '#009250', '#059C30', '#0BA60B', '#3BB111', '#6FBB18', '#A4C520', '#B6D11B', '#CBDC15', '#E4E80F', '#F3EB08', '#FFE600', '#FBDA02', '#F8CF05', '#F4C107', '#F1B709', '#EDAD0B', '#E58611', '#DE6316', '#D6431B', '#CF2620', '#C7243A', '#C42245', '#C01F52', '#BD1D5D', '#B91B67', '#B61972', '#AF1C74', '#A81F76', '#A12275', '#9A2475', '#932674', '#953095', '#7F3B97', '#6C469A', '#5F519C', '#5D639E', '#4D5FA3', '#3B60A8', '#2962AD', '#156BB2', '#007AB7', '#007CB5', '#0080B2', '#0081B0', '#0085AD'];
+
 var colorLength = colors.length;
 
 function textToColor(s) {
@@ -1181,7 +1290,7 @@ function textToColor(s) {
 }
 
 function numToColor(n) {
-  return colors[n % colorLength];
+  return colors[n * 8 % colorLength];
 }
 
 },{}],6:[function(require,module,exports){

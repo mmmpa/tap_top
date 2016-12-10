@@ -15,9 +15,35 @@ body
   &.ps-x-label-container,
   &.ps-y-label,
   &.ps-x-label,
-  &.ps-x-label-inner
+  &.ps-x-label-inner,
+  &.ps-row-item-container,
     box-sizing: border-box
     position: absolute
+
+  &.ps-row-item-container
+    overflow-y: scroll
+
+  &.ps-row-item
+    white-space: nowrap
+    width: 100%
+  &.ps-row-item-color,
+  &.ps-row-item-name,
+  &.ps-row-item-value,
+    display: table-cell
+    vertical-align: middle
+
+  &.ps-row-item-name
+    width: 100%
+
+  &.ps-row-item-value,
+    width: 1px
+    white-space: nowrap
+    padding-left: 3px
+
+  &.ps-row-item-color
+    white-space: nowrap
+    margin-right: 3px
+    content: '■'
 
   &.ps-y-label
     height: 0

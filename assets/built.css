@@ -7,9 +7,27 @@ body {
   font-family: "Cutive Mono"; }
   .ps-chart.ps-container {
     position: relative; }
-  .ps-chart.ps-line-box, .ps-chart.ps-y-label-container, .ps-chart.ps-x-label-container, .ps-chart.ps-y-label, .ps-chart.ps-x-label, .ps-chart.ps-x-label-inner {
+  .ps-chart.ps-line-box, .ps-chart.ps-y-label-container, .ps-chart.ps-x-label-container, .ps-chart.ps-y-label, .ps-chart.ps-x-label, .ps-chart.ps-x-label-inner, .ps-chart.ps-row-item-container {
     box-sizing: border-box;
     position: absolute; }
+  .ps-chart.ps-row-item-container {
+    overflow-y: scroll; }
+  .ps-chart.ps-row-item {
+    white-space: nowrap;
+    width: 100%; }
+  .ps-chart.ps-row-item-color, .ps-chart.ps-row-item-name, .ps-chart.ps-row-item-value {
+    display: table-cell;
+    vertical-align: middle; }
+  .ps-chart.ps-row-item-name {
+    width: 100%; }
+  .ps-chart.ps-row-item-value {
+    width: 1px;
+    white-space: nowrap;
+    padding-left: 3px; }
+  .ps-chart.ps-row-item-color {
+    white-space: nowrap;
+    margin-right: 3px;
+    content: "■"; }
   .ps-chart.ps-y-label {
     height: 0;
     line-height: 0;

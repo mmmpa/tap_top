@@ -1,6 +1,8 @@
 package taptop
 
-import "time"
+import (
+	"time"
+)
 
 func Run() {
 	q := make(chan ResultRaw)
@@ -18,8 +20,14 @@ func Run() {
 		Corrector: c,
 	}.Run()
 
-	go StoreInterval(10 * time.Second, "result.log", func() interface{} {
-		return c.Correction
+	go StoreInterval(10 * time.Second, "result.log", func() []byte {
+		j, err := c.Marshal()
+
+		if err != nil {
+			return nil
+		}
+
+		return j
 	})
 
 	for {
