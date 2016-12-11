@@ -4,661 +4,17 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _preact = require('preact');
-
-var _hub = require('../utils/hub');
-
-var _hub2 = _interopRequireDefault(_hub);
-
-var _events = require('events');
-
-var _index = require('../index');
-
-var _chartData = require('../models/chart-data');
-
-var _chartData2 = _interopRequireDefault(_chartData);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var React = { Component: _preact.Component, cloneElement: _preact.cloneElement, createElement: _preact.h };
-var ReactDOM = { render: _preact.render };
-
-var waitCount = 0;
-
-var ChartComponent = function (_React$Component) {
-  _inherits(ChartComponent, _React$Component);
-
-  function ChartComponent() {
-    _classCallCheck(this, ChartComponent);
-
-    return _possibleConstructorReturn(this, (ChartComponent.__proto__ || Object.getPrototypeOf(ChartComponent)).apply(this, arguments));
-  }
-
-  _createClass(ChartComponent, [{
-    key: 'componentWillMount',
-    value: function componentWillMount() {
-      var _this2 = this;
-
-      this.state = {
-        data: new _chartData2.default(this.props.data, _index.Configure.size, this.props.conf.stack),
-        xLabels: (this.props.xLabels || []).concat(),
-        wait: 0,
-        innerHub: new _events.EventEmitter()
-      };
-
-      this.state.innerHub.on('line:over', function (e) {
-        return _this2.strong(e);
-      });
-      _hub2.default.on(this.props.name, function (e) {
-        return _this2.receive(e);
-      });
-    }
-  }, {
-    key: 'strong',
-    value: function strong(e) {}
-  }, {
-    key: 'receive',
-    value: function receive(e) {
-      switch (e.type) {
-        case 'add':
-          this.add(e.data, e.xLabel);
-        default:
-        //
-      }
-    }
-  }, {
-    key: 'add',
-    value: function add(newData, xLabel) {
-      this.state.data.add(newData);
-
-      var newLabels = this.state.xLabels;
-      if (xLabel) {
-        newLabels = newLabels.concat();
-        newLabels.shift();
-        newLabels.push(xLabel);
-      }
-
-      this.setState({
-        data: this.state.data,
-        xLabels: newLabels,
-        wait: waitCount
-      });
-    }
-  }, {
-    key: 'render',
-    value: function render() {
-      var conf = this.props.conf;
-      var _props$conf = this.props.conf,
-          w = _props$conf.w,
-          h = _props$conf.h,
-          yLabelWidth = _props$conf.yLabelWidth,
-          xLabelHeight = _props$conf.xLabelHeight;
-
-      conf.innerHub = this.state.innerHub;
-
-      return React.createElement(
-        'div',
-        {
-          className: 'ps-chart ps-container',
-          style: { width: w + yLabelWidth, height: h + xLabelHeight } },
-        React.createElement(YLabelContainer, { conf: conf }),
-        React.createElement(XLabelContainer, { conf: conf, labels: this.state.xLabels }),
-        React.createElement(
-          Box,
-          { conf: conf },
-          this.lines
-        ),
-        React.createElement(
-          RowItemContainer,
-          { conf: conf },
-          this.rowItems
-        )
-      );
-    }
-  }, {
-    key: 'lines',
-    get: function get() {
-      var conf = this.props.conf;
-
-      var ls = [];
-      for (var i in this.state.data.data) {
-        var row = this.state.data.data[i];
-        if (conf.stack) {
-          ls.push(React.createElement(Line, _extends({ line: row.stack, data: row }, { conf: conf })));
-        } else {
-          ls.push(React.createElement(Line, _extends({ line: row.data, data: row }, { conf: conf })));
-        }
-      }
-      return ls.reverse();
-    }
-  }, {
-    key: 'rowItems',
-    get: function get() {
-      var conf = this.props.conf;
-      var yLabelFormat = conf.yLabelFormat;
-
-      var items = [];
-      for (var i in this.state.data.data) {
-        var data = this.state.data.data[i];
-        var value = data.data[data.data.length - 1];
-        yLabelFormat && (value = yLabelFormat(value));
-        items.push(React.createElement(RowItem, { value: value, data: data, conf: conf }));
-      }
-      return items.reverse();
-    }
-  }]);
-
-  return ChartComponent;
-}(React.Component);
-
-exports.default = ChartComponent;
-
-var RowItemContainer = function () {
-  function RowItemContainer() {
-    _classCallCheck(this, RowItemContainer);
-  }
-
-  _createClass(RowItemContainer, [{
-    key: 'render',
-    value: function render() {
-      var _props$conf2 = this.props.conf,
-          w = _props$conf2.w,
-          h = _props$conf2.h,
-          yLabelWidth = _props$conf2.yLabelWidth,
-          xLabelHeight = _props$conf2.xLabelHeight,
-          rowItemWidth = _props$conf2.rowItemWidth;
-
-      return React.createElement(
-        'div',
-        { className: 'ps-chart ps-row-item-container', style: {
-            top: 0,
-            left: w + xLabelHeight,
-            width: rowItemWidth,
-            height: h + xLabelHeight
-          } },
-        this.props.children
-      );
-    }
-  }]);
-
-  return RowItemContainer;
-}();
-
-var RowItem = function () {
-  function RowItem() {
-    _classCallCheck(this, RowItem);
-  }
-
-  _createClass(RowItem, [{
-    key: 'render',
-    value: function render() {
-      var _props$data = this.props.data,
-          name = _props$data.name,
-          color = _props$data.color;
-      var value = this.props.value;
-
-      return React.createElement(
-        'div',
-        { className: 'ps-chart ps-row-item' },
-        React.createElement(
-          'div',
-          { className: 'ps-chart ps-row-item-color', style: {
-              color: color
-
-            } },
-          '\u25A0'
-        ),
-        React.createElement(
-          'div',
-          { className: 'ps-chart ps-row-item-name' },
-          name
-        ),
-        React.createElement(
-          'div',
-          { className: 'ps-chart ps-row-item-value' },
-          value
-        )
-      );
-    }
-  }]);
-
-  return RowItem;
-}();
-
-var YLabelContainer = function () {
-  function YLabelContainer() {
-    _classCallCheck(this, YLabelContainer);
-  }
-
-  _createClass(YLabelContainer, [{
-    key: 'render',
-    value: function render() {
-      var _props$conf3 = this.props.conf,
-          w = _props$conf3.w,
-          h = _props$conf3.h,
-          yLabelWidth = _props$conf3.yLabelWidth,
-          yMax = _props$conf3.yMax,
-          yLabelStep = _props$conf3.yLabelStep;
-
-
-      return React.createElement(
-        'div',
-        { className: 'ps-chart ps-y-label-container', style: {
-            top: 0,
-            left: 0
-          } },
-        this.labels
-      );
-    }
-  }, {
-    key: 'labels',
-    get: function get() {
-      var conf = this.props.conf;
-      var _props$conf4 = this.props.conf,
-          w = _props$conf4.w,
-          h = _props$conf4.h,
-          yLabelWidth = _props$conf4.yLabelWidth,
-          yMax = _props$conf4.yMax,
-          yLabelStep = _props$conf4.yLabelStep;
-
-      var ls = [];
-      var l = Math.round(yMax / yLabelStep);
-      var yStep = h / (yMax / yLabelStep);
-      for (var i = 0; i <= l; i++) {
-        ls.push(React.createElement(YLabel, {
-          conf: conf,
-          label: i * yLabelStep,
-          top: h - yStep * i
-        }));
-      }
-
-      return ls;
-    }
-  }]);
-
-  return YLabelContainer;
-}();
-
-var XLabelContainer = function (_React$Component2) {
-  _inherits(XLabelContainer, _React$Component2);
-
-  function XLabelContainer() {
-    _classCallCheck(this, XLabelContainer);
-
-    return _possibleConstructorReturn(this, (XLabelContainer.__proto__ || Object.getPrototypeOf(XLabelContainer)).apply(this, arguments));
-  }
-
-  _createClass(XLabelContainer, [{
-    key: 'render',
-    value: function render() {
-      var _props$conf5 = this.props.conf,
-          w = _props$conf5.w,
-          h = _props$conf5.h,
-          yLabelWidth = _props$conf5.yLabelWidth,
-          yMax = _props$conf5.yMax,
-          yLabelStep = _props$conf5.yLabelStep,
-          xLabelHeight = _props$conf5.xLabelHeight;
-
-
-      return React.createElement(
-        'div',
-        { className: 'ps-chart ps-x-label-container', style: {
-            top: h,
-            left: yLabelWidth,
-            width: w,
-            height: xLabelHeight
-          } },
-        this.labels
-      );
-    }
-  }, {
-    key: 'labels',
-    get: function get() {
-      var conf = this.props.conf;
-      var _props$conf6 = this.props.conf,
-          w = _props$conf6.w,
-          h = _props$conf6.h,
-          yLabelWidth = _props$conf6.yLabelWidth,
-          yMax = _props$conf6.yMax,
-          yLabelStep = _props$conf6.yLabelStep,
-          xSize = _props$conf6.xSize,
-          xLabelFormat = _props$conf6.xLabelFormat;
-
-      var ls = [];
-      var l = Math.round(yMax / yLabelStep);
-      var xStep = w / (xSize - 1);
-      for (var i = 0; i < xSize; i++) {
-        var xl = this.props.labels[i] || 0;
-        ls.push(React.createElement(XLabel, {
-          conf: conf,
-          label: xLabelFormat ? xLabelFormat(xl) : xl,
-          left: xStep * i,
-          top: 0
-        }));
-      }
-
-      return ls;
-    }
-  }]);
-
-  return XLabelContainer;
-}(React.Component);
-
-var YLabel = function () {
-  function YLabel() {
-    _classCallCheck(this, YLabel);
-  }
-
-  _createClass(YLabel, [{
-    key: 'render',
-    value: function render() {
-      var _props = this.props,
-          top = _props.top,
-          label = _props.label;
-      var _props$conf7 = this.props.conf,
-          yLabelWidth = _props$conf7.yLabelWidth,
-          yLabelFormat = _props$conf7.yLabelFormat;
-
-
-      return React.createElement(
-        'div',
-        { className: 'ps-chart ps-y-label', style: {
-            top: top,
-            width: yLabelWidth
-          } },
-        yLabelFormat ? yLabelFormat(label) : label
-      );
-    }
-  }]);
-
-  return YLabel;
-}();
-
-var XLabel = function (_React$Component3) {
-  _inherits(XLabel, _React$Component3);
-
-  function XLabel() {
-    _classCallCheck(this, XLabel);
-
-    return _possibleConstructorReturn(this, (XLabel.__proto__ || Object.getPrototypeOf(XLabel)).apply(this, arguments));
-  }
-
-  _createClass(XLabel, [{
-    key: 'componentDidMount',
-    value: function componentDidMount() {
-      this.reset();
-    }
-  }, {
-    key: 'reset',
-    value: function reset() {
-      var _this5 = this;
-
-      if (this.props.centering) {
-        setTimeout(function () {
-          _this5.setState({
-            offset: -_this5.innerLabel.clientWidth / 2
-          });
-        }, 0);
-      }
-    }
-  }, {
-    key: 'render',
-    value: function render() {
-      var _this6 = this;
-
-      var _props2 = this.props,
-          left = _props2.left,
-          label = _props2.label;
-
-      return React.createElement(
-        'div',
-        { className: 'ps-chart ps-x-label', style: {
-            left: left,
-            transform: 'rotateZ(' + (this.props.conf.xLabelRotate || 0) + 'deg)'
-          } },
-        React.createElement(
-          'div',
-          { className: 'ps-chart ps-x-label-inner', ref: function ref(l) {
-              return _this6.innerLabel = l;
-            }, style: { left: this.state.offset } },
-          label
-        )
-      );
-    }
-  }]);
-
-  return XLabel;
-}(React.Component);
-
-var Box = function () {
-  function Box() {
-    _classCallCheck(this, Box);
-  }
-
-  _createClass(Box, [{
-    key: 'render',
-    value: function render() {
-      var conf = this.props.conf;
-      var w = conf.w,
-          h = conf.h,
-          yLabelWidth = conf.yLabelWidth,
-          xLabelHeight = conf.xLabelHeight;
-
-      var width = w;
-      var height = h;
-      var viewBox = '0 0 ' + w + ' ' + h;
-      return React.createElement(
-        'svg',
-        _extends({
-          className: 'ps-chart ps-line-box',
-          style: { top: 0, left: yLabelWidth, width: width, height: height },
-          x: '0px',
-          y: '0px'
-        }, { viewBox: viewBox }),
-        React.createElement(BoxBG, { conf: conf }),
-        this.props.children
-      );
-    }
-  }]);
-
-  return Box;
-}();
-
-var BoxBG = function (_React$Component4) {
-  _inherits(BoxBG, _React$Component4);
-
-  function BoxBG() {
-    _classCallCheck(this, BoxBG);
-
-    return _possibleConstructorReturn(this, (BoxBG.__proto__ || Object.getPrototypeOf(BoxBG)).apply(this, arguments));
-  }
-
-  _createClass(BoxBG, [{
-    key: 'shouldComponentUpdate',
-    value: function shouldComponentUpdate() {
-      return false;
-    }
-  }, {
-    key: 'render',
-    value: function render() {
-      return React.createElement(
-        'g',
-        { x: '0px', y: '0px' },
-        this.horizontalLines,
-        this.verticalLines
-      );
-    }
-  }, {
-    key: 'horizontalLines',
-    get: function get() {
-      var conf = this.props.conf;
-      var w = conf.w,
-          h = conf.h,
-          yLabelWidth = conf.yLabelWidth,
-          yMax = conf.yMax,
-          yLabelStep = conf.yLabelStep;
-
-      var ls = [];
-      var l = Math.round(yMax / yLabelStep);
-      var yStep = h / (yMax / yLabelStep);
-      for (var i = 0; i <= l; i++) {
-        var y = yStep * i;
-        var a = {
-          x1: 0,
-          x2: w,
-          y1: y,
-          y2: y
-        };
-        ls.push(React.createElement('line', _extends({}, a, { style: 'stroke:#ecf0f1; stroke-width:1;' })));
-      }
-
-      return ls;
-    }
-  }, {
-    key: 'verticalLines',
-    get: function get() {
-      var _props$conf8 = this.props.conf,
-          w = _props$conf8.w,
-          h = _props$conf8.h,
-          yLabelWidth = _props$conf8.yLabelWidth,
-          yMax = _props$conf8.yMax,
-          yLabelStep = _props$conf8.yLabelStep,
-          xSize = _props$conf8.xSize,
-          xLabelFormat = _props$conf8.xLabelFormat;
-
-      var ls = [];
-      var l = Math.round(yMax / yLabelStep);
-      var xStep = w / (xSize - 1);
-
-      for (var i = 0; i < xSize; i++) {
-        var x = xStep * i;
-        var a = {
-          x1: x,
-          x2: x,
-          y1: 0,
-          y2: h
-        };
-        ls.push(React.createElement('line', _extends({}, a, { style: 'stroke:#ecf0f1; stroke-width:1', 'stroke-dasharray': '2, 4' })));
-      }
-
-      return ls;
-    }
-  }]);
-
-  return BoxBG;
-}(React.Component);
-
-// y 位置は高さから逆算
-
-
-var Line = function () {
-  function Line() {
-    _classCallCheck(this, Line);
-  }
-
-  _createClass(Line, [{
-    key: 'computeX',
-    value: function computeX(position, length) {
-      var w = this.props.conf.w;
-
-
-      return (w + 1) / (length - 1) * position;
-    }
-  }, {
-    key: 'computeY',
-    value: function computeY(value) {
-      var _props$conf9 = this.props.conf,
-          h = _props$conf9.h,
-          yMax = _props$conf9.yMax;
-
-
-      return h - h * (value / yMax);
-    }
-  }, {
-    key: 'render',
-    value: function render() {
-      var _this8 = this;
-
-      var stack = this.props.conf.stack;
-      var line = this.props.line;
-
-
-      var onMouseOver = function onMouseOver(e) {
-        _this8.props.conf.innerHub.emit('line:over', {
-          name: _this8.props.data.name,
-          color: _this8.props.data.color,
-          e: e
-        });
-      };
-
-      return React.createElement(
-        'g',
-        _extends({ id: this.props.data.name + this.props.data.id }, { onMouseOver: onMouseOver }, { key: this.props.data.name }),
-        React.createElement('path', { fill: stack ? this.props.data.color : 'none', d: this.lineValue, style: 'stroke:' + this.props.data.color + ';stroke-width:1' })
-      );
-    }
-  }, {
-    key: 'lineValue',
-    get: function get() {
-      var _props$conf10 = this.props.conf,
-          stack = _props$conf10.stack,
-          w = _props$conf10.w,
-          h = _props$conf10.h;
-      var line = this.props.line;
-
-
-      var start = -1;
-      var end = w + 1;
-
-      var d = 'M ' + start + ' ' + this.computeY(line[0]) + ' ';
-      var l = line.length;
-      for (var i = 1; i < l; i++) {
-        d += 'L ' + this.computeX(i, l) + ' ' + this.computeY(line[i]);
-      }
-
-      if (stack) {
-        d += 'L ' + end + ' ' + h + ' L ' + start + ' ' + h;
-      }
-
-      return d;
-    }
-  }]);
-
-  return Line;
-}();
-
-},{"../index":2,"../models/chart-data":3,"../utils/hub":6,"events":7,"preact":8}],2:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
 exports.Configure = undefined;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _preact = require('preact');
 
-var _chart = require('./components/chart');
-
-var _chart2 = _interopRequireDefault(_chart);
+var _prettySimpleChart = require('./pretty-simple-chart');
 
 var _events = require('events');
 
-var _colorWheel = require('./utils/color-wheel');
-
-var _hub = require('./utils/hub');
+var _hub = require('./pretty-simple-chart/utils/hub');
 
 var _hub2 = _interopRequireDefault(_hub);
 
@@ -832,96 +188,96 @@ var Watcher = function () {
         });
       });
 
-      (0, _preact.render)(React.createElement(_chart2.default, {
+      (0, _prettySimpleChart.renderChart)('totalCPU', {
         name: 'totalCPU',
         data: CPUList,
+        size: Configure.size,
         xLabels: this.timeList,
-        conf: {
-          stack: true,
-          w: 600,
-          h: 300,
-          xLabelHeight: 70,
-          xSize: Configure.size,
-          xLabelRotate: 90,
-          yLabelWidth: 50,
-          yMax: 100,
-          yLabelStep: 20,
-          rowItemWidth: 200,
-          yLabelFormat: function yLabelFormat(v) {
-            return v + ' %';
-          },
-          xLabelFormat: function xLabelFormat(v) {
-            return dateString(v);
-          }
-        } }), document.querySelector('#' + this.conf.totalCPU));
+        stack: true,
+        w: 600,
+        h: 300,
+        xLabelHeight: 70,
+        xSize: Configure.size,
+        xLabelRotate: 90,
+        yLabelWidth: 50,
+        yMax: 100,
+        yLabelStep: 20,
+        rowItemWidth: 200,
+        yLabelFormat: function yLabelFormat(v) {
+          return v + ' %';
+        },
+        xLabelFormat: function xLabelFormat(v) {
+          return dateString(v);
+        }
+      });
 
-      (0, _preact.render)(React.createElement(_chart2.default, {
+      (0, _prettySimpleChart.renderChart)('totalMemory', {
         name: 'totalMemory',
         data: memoryList,
+        size: Configure.size,
         xLabels: this.timeList,
-        conf: {
-          stack: true,
-          w: 600,
-          h: 300,
-          xLabelHeight: 70,
-          xSize: Configure.size,
-          xLabelRotate: 90,
-          yLabelWidth: 50,
-          yMax: 100,
-          yLabelStep: 20,
-          rowItemWidth: 200,
-          yLabelFormat: function yLabelFormat(v) {
-            return v + ' %';
-          },
-          xLabelFormat: function xLabelFormat(v) {
-            return dateString(v);
-          }
-        } }), document.querySelector('#' + this.conf.totalMemory));
+        stack: true,
+        w: 600,
+        h: 300,
+        xLabelHeight: 70,
+        xSize: Configure.size,
+        xLabelRotate: 90,
+        yLabelWidth: 50,
+        yMax: 100,
+        yLabelStep: 20,
+        rowItemWidth: 200,
+        yLabelFormat: function yLabelFormat(v) {
+          return v + ' %';
+        },
+        xLabelFormat: function xLabelFormat(v) {
+          return dateString(v);
+        }
+      });
 
-      (0, _preact.render)(React.createElement(_chart2.default, {
+      (0, _prettySimpleChart.renderChart)('CPUGraph', {
         name: 'PerCPU',
         data: pickRow('%CPU', processList),
+        size: Configure.size,
         xLabels: this.timeList,
-        conf: {
-          w: 600,
-          h: 300,
-          xLabelHeight: 70,
-          xSize: Configure.size,
-          xLabelRotate: 90,
-          yLabelWidth: 50,
-          yMax: 200,
-          yLabelStep: 20,
-          rowItemWidth: 200,
-          yLabelFormat: function yLabelFormat(v) {
-            return v + ' %';
-          },
-          xLabelFormat: function xLabelFormat(v) {
-            return dateString(v);
-          }
-        } }), document.querySelector('#' + this.conf.CPUGraph));
+        w: 600,
+        h: 300,
+        xLabelHeight: 70,
+        xSize: Configure.size,
+        xLabelRotate: 90,
+        yLabelWidth: 50,
+        yMax: 200,
+        yLabelStep: 20,
+        rowItemWidth: 200,
+        yLabelFormat: function yLabelFormat(v) {
+          return v + ' %';
+        },
+        xLabelFormat: function xLabelFormat(v) {
+          return dateString(v);
+        }
+      });
 
-      (0, _preact.render)(React.createElement(_chart2.default, {
+      (0, _prettySimpleChart.renderChart)('memoryGraph', {
         name: 'PerMemory',
         data: pickRow('%MEM', processList),
+        size: Configure.size,
         xLabels: this.timeList,
-        conf: {
-          stack: true,
-          w: 600,
-          h: 600,
-          xLabelHeight: 70,
-          xSize: Configure.size,
-          xLabelRotate: 90,
-          yLabelWidth: 50,
-          yMax: 100,
-          yLabelStep: 5,
-          rowItemWidth: 200,
-          yLabelFormat: function yLabelFormat(v) {
-            return v + ' %';
-          },
-          xLabelFormat: function xLabelFormat(v) {
-            return dateString(v);
-          }
-        } }), document.querySelector('#' + this.conf.memoryGraph));
+        stack: true,
+        w: 600,
+        h: 600,
+        xLabelHeight: 70,
+        xSize: Configure.size,
+        xLabelRotate: 90,
+        yLabelWidth: 50,
+        yMax: 100,
+        yLabelStep: 5,
+        rowItemWidth: 200,
+        yLabelFormat: function yLabelFormat(v) {
+          return v + ' %';
+        },
+        xLabelFormat: function xLabelFormat(v) {
+          return dateString(v);
+        }
+      });
 
       setInterval(function () {
         req.get('/r').set('Accept', 'application/json').end(function (err, res) {
@@ -945,8 +301,18 @@ var Watcher = function () {
 
           var memoryList = {
             // 1: { id: 1, color: '#bdc3c7', name: 'free', value: Math.round(memory.Free / this.totalMemory * 1000) / 10 },
-            2: { id: 2, color: '#e74c3c', name: 'used', value: Math.round(memory.Used / _this.totalMemory * 1000) / 10 },
-            3: { id: 3, color: '#9b59b6', name: 'buffers', value: Math.round(memory.Buffers / _this.totalMemory * 1000) / 10 }
+            2: {
+              id: 2,
+              color: '#e74c3c',
+              name: 'used',
+              value: Math.round(memory.Used / _this.totalMemory * 1000) / 10
+            },
+            3: {
+              id: 3,
+              color: '#9b59b6',
+              name: 'buffers',
+              value: Math.round(memory.Buffers / _this.totalMemory * 1000) / 10
+            }
           };
 
           _hub2.default.emit('totalMemory', {
@@ -1077,7 +443,945 @@ var DataStore = function () {
 
 window.Watcher = Watcher;
 
-},{"./components/chart":1,"./utils/color-wheel":5,"./utils/hub":6,"events":7,"preact":8}],3:[function(require,module,exports){
+},{"./pretty-simple-chart":11,"./pretty-simple-chart/utils/hub":15,"events":16,"preact":17}],2:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _preact = require('preact');
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var React = { Component: _preact.Component, cloneElement: _preact.cloneElement, createElement: _preact.h };
+
+var BoxBG = function (_React$Component) {
+  _inherits(BoxBG, _React$Component);
+
+  function BoxBG() {
+    _classCallCheck(this, BoxBG);
+
+    return _possibleConstructorReturn(this, (BoxBG.__proto__ || Object.getPrototypeOf(BoxBG)).apply(this, arguments));
+  }
+
+  _createClass(BoxBG, [{
+    key: 'shouldComponentUpdate',
+    value: function shouldComponentUpdate() {
+      return false;
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      return React.createElement(
+        'g',
+        null,
+        this.horizontalLines,
+        this.verticalLines
+      );
+    }
+  }, {
+    key: 'horizontalLines',
+    get: function get() {
+      var conf = this.props.conf;
+      var w = conf.w,
+          h = conf.h,
+          yMax = conf.yMax,
+          yLabelStep = conf.yLabelStep;
+
+
+      var l = Math.round(yMax / yLabelStep);
+      var yStep = h / (yMax / yLabelStep);
+
+      var ls = [];
+
+      for (var i = 0; i <= l; i++) {
+        var y = yStep * i;
+
+        ls.push(React.createElement('line', {
+          x1: 0,
+          x2: w,
+          y1: y,
+          y2: y,
+          style: { stroke: '#ecf0f1', strokeWidth: 1 }
+        }));
+      }
+
+      return ls;
+    }
+  }, {
+    key: 'verticalLines',
+    get: function get() {
+      var _props$conf = this.props.conf,
+          w = _props$conf.w,
+          h = _props$conf.h,
+          xSize = _props$conf.xSize;
+
+
+      var xStep = w / (xSize - 1);
+
+      var ls = [];
+
+      for (var i = 0; i < xSize; i++) {
+        var x = xStep * i;
+
+        ls.push(React.createElement('line', {
+          x1: x,
+          x2: x,
+          y1: 0,
+          y2: h,
+          style: { stroke: '#ecf0f1', strokeWidth: 1, strokeDasharray: "2, 4" }
+        }));
+      }
+
+      return ls;
+    }
+  }]);
+
+  return BoxBG;
+}(React.Component);
+
+exports.default = BoxBG;
+
+},{"preact":17}],3:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _preact = require('preact');
+
+var _boxBg = require('./box-bg');
+
+var _boxBg2 = _interopRequireDefault(_boxBg);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var React = { Component: _preact.Component, cloneElement: _preact.cloneElement, createElement: _preact.h };
+
+var Box = function () {
+  function Box() {
+    _classCallCheck(this, Box);
+  }
+
+  _createClass(Box, [{
+    key: 'render',
+    value: function render() {
+      var conf = this.props.conf;
+      var w = conf.w,
+          h = conf.h,
+          yLabelWidth = conf.yLabelWidth;
+
+      var width = w;
+      var height = h;
+      var viewBox = '0 0 ' + w + ' ' + h;
+
+      return React.createElement(
+        'svg',
+        _extends({
+          className: 'ps-chart ps-line-box',
+          style: { top: 0, left: yLabelWidth, width: width, height: height },
+          x: '0px',
+          y: '0px'
+        }, { viewBox: viewBox }),
+        React.createElement(_boxBg2.default, { conf: conf }),
+        this.props.children
+      );
+    }
+  }]);
+
+  return Box;
+}();
+
+exports.default = Box;
+
+},{"./box-bg":2,"preact":17}],4:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _preact = require('preact');
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var React = { Component: _preact.Component, cloneElement: _preact.cloneElement, createElement: _preact.h };
+
+var Line = function () {
+  function Line() {
+    _classCallCheck(this, Line);
+  }
+
+  _createClass(Line, [{
+    key: 'computeX',
+    value: function computeX(position, length) {
+      var w = this.props.conf.w;
+
+
+      return (w + 1) / (length - 1) * position;
+    }
+  }, {
+    key: 'computeY',
+    value: function computeY(value) {
+      var _props$conf = this.props.conf,
+          h = _props$conf.h,
+          yMax = _props$conf.yMax;
+
+
+      return h - h * (value / yMax);
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      var _this = this;
+
+      var stack = this.props.conf.stack;
+      var _props = this.props,
+          line = _props.line,
+          color = _props.color,
+          thickness = _props.thickness,
+          toggleRow = _props.toggleRow;
+      var _props$data = this.props.data,
+          id = _props$data.id,
+          name = _props$data.name;
+
+
+      var onMouseOver = function onMouseOver(e) {
+        _this.props.conf.innerHub.emit('line:over', {
+          name: _this.props.data.name,
+          color: _this.props.data.color,
+          e: e
+        });
+      };
+
+      return React.createElement(
+        'g',
+        _extends({
+          id: name + id }, { onMouseOver: onMouseOver }, { key: name }),
+        React.createElement('path', {
+          onMouseOver: function onMouseOver() {
+            return toggleRow(id, true);
+          },
+          fill: stack ? color : 'none', d: this.lineValue, style: 'stroke:' + color + ';stroke-width:' + thickness })
+      );
+    }
+  }, {
+    key: 'lineValue',
+    get: function get() {
+      var _props$conf2 = this.props.conf,
+          stack = _props$conf2.stack,
+          w = _props$conf2.w,
+          h = _props$conf2.h;
+      var line = this.props.line;
+
+
+      var start = -1;
+      var end = w + 1;
+
+      var d = 'M ' + start + ' ' + this.computeY(line[0]) + ' ';
+      var l = line.length;
+      for (var i = 1; i < l; i++) {
+        d += 'L ' + this.computeX(i, l) + ' ' + this.computeY(line[i]);
+      }
+
+      if (stack) {
+        d += 'L ' + end + ' ' + h + ' L ' + start + ' ' + h;
+      }
+
+      return d;
+    }
+  }]);
+
+  return Line;
+}();
+
+exports.default = Line;
+
+},{"preact":17}],5:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _preact = require("preact");
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var React = { Component: _preact.Component, cloneElement: _preact.cloneElement, createElement: _preact.h };
+
+var RowItemContainer = function () {
+  function RowItemContainer() {
+    _classCallCheck(this, RowItemContainer);
+  }
+
+  _createClass(RowItemContainer, [{
+    key: "render",
+    value: function render() {
+      var _props$conf = this.props.conf,
+          w = _props$conf.w,
+          h = _props$conf.h,
+          xLabelHeight = _props$conf.xLabelHeight,
+          rowItemWidth = _props$conf.rowItemWidth;
+
+      return React.createElement(
+        "div",
+        {
+          className: "ps-chart ps-row-item-container",
+          style: {
+            top: 0,
+            left: w + xLabelHeight,
+            width: rowItemWidth,
+            height: h + xLabelHeight
+          } },
+        this.props.children
+      );
+    }
+  }]);
+
+  return RowItemContainer;
+}();
+
+exports.default = RowItemContainer;
+
+},{"preact":17}],6:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _preact = require('preact');
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var React = { Component: _preact.Component, cloneElement: _preact.cloneElement, createElement: _preact.h };
+
+var RowItem = function () {
+  function RowItem() {
+    _classCallCheck(this, RowItem);
+  }
+
+  _createClass(RowItem, [{
+    key: 'render',
+    value: function render() {
+      var _props$data = this.props.data,
+          name = _props$data.name,
+          color = _props$data.color,
+          id = _props$data.id;
+      var _props = this.props,
+          toggleRow = _props.toggleRow,
+          value = _props.value,
+          selected = _props.selected;
+
+
+      var additionalClassName = selected ? 'ps-row-item-selected' : '';
+
+      return React.createElement(
+        'div',
+        {
+          className: 'ps-chart ps-row-item ' + additionalClassName,
+          onMouseOver: function onMouseOver() {
+            return toggleRow(id, true);
+          } },
+        React.createElement(
+          'div',
+          { className: 'ps-chart ps-row-item-color', style: { color: color } },
+          '\u25A0'
+        ),
+        React.createElement(
+          'div',
+          { className: 'ps-chart ps-row-item-name' },
+          name
+        ),
+        React.createElement(
+          'div',
+          { className: 'ps-chart ps-row-item-value' },
+          value
+        )
+      );
+    }
+  }]);
+
+  return RowItem;
+}();
+
+exports.default = RowItem;
+
+},{"preact":17}],7:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _preact = require('preact');
+
+var _xLabel = require('./x-label');
+
+var _xLabel2 = _interopRequireDefault(_xLabel);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var React = { Component: _preact.Component, cloneElement: _preact.cloneElement, createElement: _preact.h };
+
+var XLabelContainer = function (_React$Component) {
+  _inherits(XLabelContainer, _React$Component);
+
+  function XLabelContainer() {
+    _classCallCheck(this, XLabelContainer);
+
+    return _possibleConstructorReturn(this, (XLabelContainer.__proto__ || Object.getPrototypeOf(XLabelContainer)).apply(this, arguments));
+  }
+
+  _createClass(XLabelContainer, [{
+    key: 'render',
+    value: function render() {
+      var conf = this.props.conf;
+      var w = conf.w,
+          h = conf.h,
+          yLabelWidth = conf.yLabelWidth,
+          xLabelHeight = conf.xLabelHeight;
+
+
+      return React.createElement(
+        'div',
+        {
+          className: 'ps-chart ps-x-label-container',
+          style: {
+            conf: conf,
+            top: h,
+            left: yLabelWidth,
+            width: w,
+            height: xLabelHeight
+          } },
+        this.labels
+      );
+    }
+  }, {
+    key: 'labels',
+    get: function get() {
+      var conf = this.props.conf;
+      var w = conf.w,
+          xSize = conf.xSize,
+          xLabelFormat = conf.xLabelFormat;
+
+
+      var xStep = w / (xSize - 1);
+
+      var ls = [];
+
+      for (var i = 0; i < xSize; i++) {
+        var xl = this.props.labels[i] || 0;
+        ls.push(React.createElement(_xLabel2.default, {
+          conf: conf,
+          label: xLabelFormat ? xLabelFormat(xl) : xl,
+          left: xStep * i,
+          top: 0
+        }));
+      }
+
+      return ls;
+    }
+  }]);
+
+  return XLabelContainer;
+}(React.Component);
+
+exports.default = XLabelContainer;
+
+},{"./x-label":8,"preact":17}],8:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _preact = require("preact");
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var React = { Component: _preact.Component, cloneElement: _preact.cloneElement, createElement: _preact.h };
+
+var XLabel = function (_React$Component) {
+  _inherits(XLabel, _React$Component);
+
+  function XLabel() {
+    _classCallCheck(this, XLabel);
+
+    return _possibleConstructorReturn(this, (XLabel.__proto__ || Object.getPrototypeOf(XLabel)).apply(this, arguments));
+  }
+
+  _createClass(XLabel, [{
+    key: "componentDidMount",
+    value: function componentDidMount() {
+      this.reset();
+    }
+  }, {
+    key: "reset",
+    value: function reset() {
+      var _this2 = this;
+
+      if (this.props.centering) {
+        setTimeout(function () {
+          _this2.setState({
+            offset: -_this2.innerLabel.clientWidth / 2
+          });
+        }, 0);
+      }
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      var _this3 = this;
+
+      var _props = this.props,
+          left = _props.left,
+          label = _props.label;
+
+      var labelRotation = this.props.conf.xLabelRotate || 0;
+
+      return React.createElement(
+        "div",
+        {
+          className: "ps-chart ps-x-label",
+          style: {
+            left: left,
+            transform: "rotateZ(" + labelRotation + "deg)"
+          } },
+        React.createElement(
+          "div",
+          {
+            className: "ps-chart ps-x-label-inner",
+            ref: function ref(l) {
+              return _this3.innerLabel = l;
+            },
+            style: { left: this.state.offset } },
+          label
+        )
+      );
+    }
+  }]);
+
+  return XLabel;
+}(React.Component);
+
+exports.default = XLabel;
+
+},{"preact":17}],9:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _preact = require('preact');
+
+var _yLabel = require('./y-label');
+
+var _yLabel2 = _interopRequireDefault(_yLabel);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var React = { Component: _preact.Component, cloneElement: _preact.cloneElement, createElement: _preact.h };
+
+var YLabelContainer = function () {
+  function YLabelContainer() {
+    _classCallCheck(this, YLabelContainer);
+  }
+
+  _createClass(YLabelContainer, [{
+    key: 'render',
+    value: function render() {
+      return React.createElement(
+        'div',
+        {
+          className: 'ps-chart ps-y-label-container',
+          style: {
+            top: 0,
+            left: 0
+          } },
+        this.labels
+      );
+    }
+  }, {
+    key: 'labels',
+    get: function get() {
+      var conf = this.props.conf;
+      var h = conf.h,
+          yMax = conf.yMax,
+          yLabelStep = conf.yLabelStep;
+
+
+      var l = Math.round(yMax / yLabelStep);
+      var yStep = h / (yMax / yLabelStep);
+
+      var ls = [];
+
+      for (var i = 0; i <= l; i++) {
+        ls.push(React.createElement(_yLabel2.default, {
+          conf: conf,
+          label: i * yLabelStep,
+          top: h - yStep * i
+        }));
+      }
+
+      return ls;
+    }
+  }]);
+
+  return YLabelContainer;
+}();
+
+exports.default = YLabelContainer;
+
+},{"./y-label":10,"preact":17}],10:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _preact = require("preact");
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var React = { Component: _preact.Component, cloneElement: _preact.cloneElement, createElement: _preact.h };
+
+var YLabel = function () {
+  function YLabel() {
+    _classCallCheck(this, YLabel);
+  }
+
+  _createClass(YLabel, [{
+    key: "render",
+    value: function render() {
+      var _props = this.props,
+          top = _props.top,
+          raw = _props.label;
+      var _props$conf = this.props.conf,
+          yLabelWidth = _props$conf.yLabelWidth,
+          yLabelFormat = _props$conf.yLabelFormat;
+
+      var label = yLabelFormat ? yLabelFormat(raw) : raw;
+
+      return React.createElement(
+        "div",
+        {
+          className: "ps-chart ps-y-label",
+          style: {
+            top: top,
+            width: yLabelWidth
+          } },
+        label
+      );
+    }
+  }]);
+
+  return YLabel;
+}();
+
+exports.default = YLabel;
+
+},{"preact":17}],11:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+exports.renderChart = renderChart;
+
+var _preact = require('preact');
+
+var _hub = require('./utils/hub');
+
+var _hub2 = _interopRequireDefault(_hub);
+
+var _events = require('events');
+
+var _index = require('../index');
+
+var _chartData = require('./models/chart-data');
+
+var _chartData2 = _interopRequireDefault(_chartData);
+
+var _xLabelContainer = require('./components/x-label-container');
+
+var _xLabelContainer2 = _interopRequireDefault(_xLabelContainer);
+
+var _yLabelContainer = require('./components/y-label-container');
+
+var _yLabelContainer2 = _interopRequireDefault(_yLabelContainer);
+
+var _box = require('./components/box');
+
+var _box2 = _interopRequireDefault(_box);
+
+var _line = require('./components/line');
+
+var _line2 = _interopRequireDefault(_line);
+
+var _rowItemContainer = require('./components/row-item-container');
+
+var _rowItemContainer2 = _interopRequireDefault(_rowItemContainer);
+
+var _rowItem = require('./components/row-item');
+
+var _rowItem2 = _interopRequireDefault(_rowItem);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var React = { Component: _preact.Component, cloneElement: _preact.cloneElement, createElement: _preact.h };
+var ReactDOM = { render: _preact.render };
+
+var waitCount = 0;
+
+function renderChart(domID, conf) {
+  (0, _preact.render)(React.createElement(ChartComponent, { conf: conf }), document.querySelector('#' + domID));
+}
+
+var ChartComponent = function (_React$Component) {
+  _inherits(ChartComponent, _React$Component);
+
+  function ChartComponent() {
+    _classCallCheck(this, ChartComponent);
+
+    return _possibleConstructorReturn(this, (ChartComponent.__proto__ || Object.getPrototypeOf(ChartComponent)).apply(this, arguments));
+  }
+
+  _createClass(ChartComponent, [{
+    key: 'componentWillMount',
+    value: function componentWillMount() {
+      var _this2 = this;
+
+      var _props$conf = this.props.conf,
+          name = _props$conf.name,
+          data = _props$conf.data,
+          size = _props$conf.size,
+          stack = _props$conf.stack,
+          xLabels = _props$conf.xLabels;
+
+
+      this.state = {
+        data: new _chartData2.default(data, size, stack),
+        xLabels: (xLabels || []).concat(),
+        wait: 0,
+        innerHub: new _events.EventEmitter(),
+        selectedID: -1
+      };
+
+      _hub2.default.on(name, function (e) {
+        return _this2.receive(e);
+      });
+    }
+  }, {
+    key: 'receive',
+    value: function receive(e) {
+      switch (e.type) {
+        case 'add':
+          this.add(e.data, e.xLabel);
+          break;
+        default:
+        //
+      }
+    }
+  }, {
+    key: 'add',
+    value: function add(newData, xLabel) {
+      this.state.data.add(newData);
+
+      var newLabels = this.state.xLabels;
+      if (xLabel) {
+        newLabels = newLabels.concat();
+        newLabels.shift();
+        newLabels.push(xLabel);
+      }
+
+      this.setState({
+        data: this.state.data,
+        xLabels: newLabels,
+        wait: waitCount
+      });
+    }
+  }, {
+    key: 'toggleRow',
+    value: function toggleRow(selectedID) {
+      var isSelecting = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+
+      isSelecting ? this.setState({ selectedID: selectedID }) : this.setState({ selectedID: -1 });
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      var _this3 = this;
+
+      var conf = this.props.conf;
+      var _props$conf2 = this.props.conf,
+          w = _props$conf2.w,
+          h = _props$conf2.h,
+          yLabelWidth = _props$conf2.yLabelWidth,
+          xLabelHeight = _props$conf2.xLabelHeight;
+
+      conf.innerHub = this.state.innerHub;
+
+      return React.createElement(
+        'div',
+        _extends({ className: 'ps-chart ps-container' }, {
+          onClick: function onClick() {
+            return _this3.setState({ selectedID: -1 });
+          },
+          style: { width: w + yLabelWidth, height: h + xLabelHeight }
+        }),
+        React.createElement(_yLabelContainer2.default, { conf: conf }),
+        React.createElement(_xLabelContainer2.default, { conf: conf, labels: this.state.xLabels }),
+        React.createElement(
+          _box2.default,
+          { conf: conf },
+          this.lines
+        ),
+        React.createElement(
+          _rowItemContainer2.default,
+          { conf: conf },
+          this.rowItems
+        )
+      );
+    }
+  }, {
+    key: 'lines',
+    get: function get() {
+      var _this4 = this;
+
+      var conf = this.props.conf;
+      var selectedID = this.state.selectedID;
+
+      var strong = this.state.selectedID !== -1;
+
+      var ls = [];
+      var selectedLine = [];
+
+      for (var i in this.state.data.data) {
+        var row = this.state.data.data[i];
+        var color = strong && selectedID !== row.id ? '#bdc3c7' : row.color;
+
+        var lineConfiguration = {
+          toggleRow: function toggleRow() {
+            return _this4.toggleRow.apply(_this4, arguments);
+          },
+          data: row,
+          color: color,
+          conf: conf
+        };
+
+        if (conf.stack) {
+          lineConfiguration.line = row.stack;
+
+          ls.push(React.createElement(_line2.default, lineConfiguration));
+        } else {
+          lineConfiguration.line = row.data;
+
+          if (strong && selectedID === row.id) {
+            lineConfiguration.thickness = 3;
+            selectedLine = React.createElement(_line2.default, lineConfiguration);
+          } else {
+            ls.push(React.createElement(_line2.default, lineConfiguration));
+          }
+        }
+      }
+
+      selectedLine && ls.unshift(selectedLine);
+
+      return ls.reverse();
+    }
+  }, {
+    key: 'rowItems',
+    get: function get() {
+      var _this5 = this;
+
+      var conf = this.props.conf;
+      var selectedID = this.state.selectedID;
+      var yLabelFormat = conf.yLabelFormat;
+
+      var items = [];
+
+      for (var i in this.state.data.data) {
+        var data = this.state.data.data[i];
+        var value = data.data[data.data.length - 1];
+        yLabelFormat && (value = yLabelFormat(value));
+
+        items.push(React.createElement(_rowItem2.default, {
+          toggleRow: function toggleRow() {
+            return _this5.toggleRow.apply(_this5, arguments);
+          },
+          selected: data.id === selectedID,
+          value: value,
+          data: data,
+          conf: conf
+        }));
+      }
+
+      return items.reverse();
+    }
+  }]);
+
+  return ChartComponent;
+}(React.Component);
+
+exports.default = ChartComponent;
+
+},{"../index":1,"./components/box":3,"./components/line":4,"./components/row-item":6,"./components/row-item-container":5,"./components/x-label-container":7,"./components/y-label-container":9,"./models/chart-data":12,"./utils/hub":15,"events":16,"preact":17}],12:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1200,7 +1504,7 @@ var ChartData = function () {
 
 exports.default = ChartData;
 
-},{"./chat-row":4}],4:[function(require,module,exports){
+},{"./chat-row":13}],13:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1273,7 +1577,7 @@ var ChartRow = function () {
 
 exports.default = ChartRow;
 
-},{"../utils/color-wheel":5}],5:[function(require,module,exports){
+},{"../utils/color-wheel":14}],14:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1293,7 +1597,7 @@ function numToColor(n) {
   return colors[n * 8 % colorLength];
 }
 
-},{}],6:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1304,7 +1608,7 @@ var _events = require('events');
 
 exports.default = new _events.EventEmitter();
 
-},{"events":7}],7:[function(require,module,exports){
+},{"events":16}],16:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -1608,7 +1912,7 @@ function isUndefined(arg) {
   return arg === void 0;
 }
 
-},{}],8:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 !function(global, factory) {
     'object' == typeof exports && 'undefined' != typeof module ? factory(exports) : 'function' == typeof define && define.amd ? define([ 'exports' ], factory) : factory(global.preact = global.preact || {});
 }(this, function(exports) {
@@ -2092,4 +2396,4 @@ function isUndefined(arg) {
     exports.options = options;
 });
 
-},{}]},{},[2]);
+},{}]},{},[1]);

@@ -1,11 +1,13 @@
 @charset "UTF-8";
 body {
   font-family: Quicksand, 游ゴシック体, "Yu Gothic", YuGothic, "ヒラギノ角ゴシック Pro", "Hiragino Kaku Gothic Pro", メイリオ, Meiryo, Osaka, "ＭＳ Ｐゴシック", "MS PGothic", sans-serif;
-  background: #ecf0f1; }
+  background: #ecf0f1;
+  padding-bottom: 30px; }
 
 .ps-chart {
   font-family: "Cutive Mono"; }
   .ps-chart.ps-container {
+    margin-top: 20px;
     position: relative; }
   .ps-chart.ps-line-box, .ps-chart.ps-y-label-container, .ps-chart.ps-x-label-container, .ps-chart.ps-y-label, .ps-chart.ps-x-label, .ps-chart.ps-x-label-inner, .ps-chart.ps-row-item-container {
     box-sizing: border-box;
@@ -15,6 +17,8 @@ body {
   .ps-chart.ps-row-item {
     white-space: nowrap;
     width: 100%; }
+    .ps-chart.ps-row-item.ps-row-item-selected {
+      background: #fff; }
   .ps-chart.ps-row-item-color, .ps-chart.ps-row-item-name, .ps-chart.ps-row-item-value {
     display: table-cell;
     vertical-align: middle; }
@@ -23,7 +27,8 @@ body {
   .ps-chart.ps-row-item-value {
     width: 1px;
     white-space: nowrap;
-    padding-left: 3px; }
+    padding-left: 3px;
+    padding-right: 3px; }
   .ps-chart.ps-row-item-color {
     white-space: nowrap;
     margin-right: 3px;

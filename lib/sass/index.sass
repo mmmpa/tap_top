@@ -4,10 +4,12 @@ $chart-box-bg: #fff
 body
   font-family: Quicksand, 游ゴシック体, "Yu Gothic", YuGothic, "ヒラギノ角ゴシック Pro", "Hiragino Kaku Gothic Pro", メイリオ, Meiryo, Osaka, "ＭＳ Ｐゴシック", "MS PGothic", sans-serif
   background: #ecf0f1
+  padding-bottom: 30px
 
 .ps-chart
   font-family: 'Cutive Mono'
   &.ps-container
+    margin-top: 20px
     position: relative
 
   &.ps-line-box,
@@ -26,6 +28,8 @@ body
   &.ps-row-item
     white-space: nowrap
     width: 100%
+    &.ps-row-item-selected
+      background: #fff
   &.ps-row-item-color,
   &.ps-row-item-name,
   &.ps-row-item-value,
@@ -39,6 +43,7 @@ body
     width: 1px
     white-space: nowrap
     padding-left: 3px
+    padding-right: 3px
 
   &.ps-row-item-color
     white-space: nowrap

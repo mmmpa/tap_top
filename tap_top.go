@@ -2,9 +2,12 @@ package taptop
 
 import (
 	"time"
+	"sync"
 )
 
 func Run() {
+	m := new(sync.Mutex)
+
 	q := make(chan ResultRaw)
 	c := NewCorrector(30)
 
@@ -21,7 +24,9 @@ func Run() {
 	}.Run()
 
 	go StoreInterval(10 * time.Second, "result.log", func() []byte {
+		m.Lock()
 		j, err := c.Marshal()
+		m.Unlock()
 
 		if err != nil {
 			return nil
@@ -31,7 +36,9 @@ func Run() {
 	})
 
 	for {
+		m.Lock()
 		c.Correct(<-q)
+		m.Unlock()
 	}
 }
 
