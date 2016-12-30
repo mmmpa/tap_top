@@ -12,11 +12,9 @@ var _preact = require('preact');
 
 var _prettySimpleChart = require('./pretty-simple-chart');
 
+var _prettySimpleChart2 = _interopRequireDefault(_prettySimpleChart);
+
 var _events = require('events');
-
-var _hub = require('./pretty-simple-chart/utils/hub');
-
-var _hub2 = _interopRequireDefault(_hub);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -188,96 +186,49 @@ var Watcher = function () {
         });
       });
 
-      (0, _prettySimpleChart.renderChart)('totalCPU', {
+      var gen = function gen(o) {
+        return Object.assign({}, {
+          size: Configure.size,
+          xLabels: _this.timeList,
+          stack: true,
+          w: 600,
+          h: 300,
+          xLabelHeight: 70,
+          xSize: Configure.size,
+          xLabelRotate: 90,
+          yLabelWidth: 50,
+          yMax: 100,
+          yLabelStep: 20,
+          rowItemWidth: 200,
+          yLabelFormat: function yLabelFormat(v) {
+            return v + ' %';
+          },
+          xLabelFormat: function xLabelFormat(v) {
+            return dateString(v);
+          }
+        }, o);
+      };
+
+      var totalCPU = new _prettySimpleChart2.default('totalCPU', gen({
         name: 'totalCPU',
-        data: CPUList,
-        size: Configure.size,
-        xLabels: this.timeList,
-        stack: true,
-        w: 600,
-        h: 300,
-        xLabelHeight: 70,
-        xSize: Configure.size,
-        xLabelRotate: 90,
-        yLabelWidth: 50,
-        yMax: 100,
-        yLabelStep: 20,
-        rowItemWidth: 200,
-        yLabelFormat: function yLabelFormat(v) {
-          return v + ' %';
-        },
-        xLabelFormat: function xLabelFormat(v) {
-          return dateString(v);
-        }
-      });
+        data: CPUList
+      })).render();
 
-      (0, _prettySimpleChart.renderChart)('totalMemory', {
+      var totalMemory = new _prettySimpleChart2.default('totalMemory', gen({
         name: 'totalMemory',
-        data: memoryList,
-        size: Configure.size,
-        xLabels: this.timeList,
-        stack: true,
-        w: 600,
-        h: 300,
-        xLabelHeight: 70,
-        xSize: Configure.size,
-        xLabelRotate: 90,
-        yLabelWidth: 50,
-        yMax: 100,
-        yLabelStep: 20,
-        rowItemWidth: 200,
-        yLabelFormat: function yLabelFormat(v) {
-          return v + ' %';
-        },
-        xLabelFormat: function xLabelFormat(v) {
-          return dateString(v);
-        }
-      });
+        data: memoryList
+      })).render();
 
-      (0, _prettySimpleChart.renderChart)('CPUGraph', {
+      var CPUGraph = new _prettySimpleChart2.default('CPUGraph', gen({
         name: 'PerCPU',
         data: pickRow('%CPU', processList),
-        size: Configure.size,
-        xLabels: this.timeList,
-        w: 600,
-        h: 300,
-        xLabelHeight: 70,
-        xSize: Configure.size,
-        xLabelRotate: 90,
-        yLabelWidth: 50,
-        yMax: 200,
-        yLabelStep: 20,
-        rowItemWidth: 200,
-        yLabelFormat: function yLabelFormat(v) {
-          return v + ' %';
-        },
-        xLabelFormat: function xLabelFormat(v) {
-          return dateString(v);
-        }
-      });
+        stack: false
+      })).render();
 
-      (0, _prettySimpleChart.renderChart)('memoryGraph', {
+      var memoryGraph = new _prettySimpleChart2.default('memoryGraph', gen({
         name: 'PerMemory',
-        data: pickRow('%MEM', processList),
-        size: Configure.size,
-        xLabels: this.timeList,
-        stack: true,
-        w: 600,
-        h: 600,
-        xLabelHeight: 70,
-        xSize: Configure.size,
-        xLabelRotate: 90,
-        yLabelWidth: 50,
-        yMax: 100,
-        yLabelStep: 5,
-        rowItemWidth: 200,
-        yLabelFormat: function yLabelFormat(v) {
-          return v + ' %';
-        },
-        xLabelFormat: function xLabelFormat(v) {
-          return dateString(v);
-        }
-      });
+        data: pickRow('%MEM', processList)
+      })).render();
 
       setInterval(function () {
         req.get('/r').set('Accept', 'application/json').end(function (err, res) {
@@ -290,11 +241,13 @@ var Watcher = function () {
 
           time *= 1000;
           var picked = pick(processes, rowPositions.PID, rowPositions.COMMAND, [rowPositions['%CPU'], rowPositions['%MEM']]);
-          _hub2.default.emit('PerCPU', {
-            type: 'add', data: picked[rowPositions['%CPU']],
+
+          CPUGraph.add({
+            data: picked[rowPositions['%CPU']],
             xLabel: time
           });
-          _hub2.default.emit('PerMemory', {
+
+          memoryGraph.add({
             type: 'add', data: picked[rowPositions['%MEM']],
             xLabel: time
           });
@@ -315,8 +268,8 @@ var Watcher = function () {
             }
           };
 
-          _hub2.default.emit('totalMemory', {
-            type: 'add', data: memoryList,
+          totalMemory.add({
+            data: memoryList,
             xLabel: time
           });
 
@@ -339,8 +292,8 @@ var Watcher = function () {
             8: { id: 8, name: 'StolenTime', value: cpu.StolenTime }
           };
 
-          _hub2.default.emit('totalCPU', {
-            type: 'add', data: CPUList,
+          totalCPU.add({
+            data: CPUList,
             xLabel: time
           });
         });
@@ -443,7 +396,7 @@ var DataStore = function () {
 
 window.Watcher = Watcher;
 
-},{"./pretty-simple-chart":11,"./pretty-simple-chart/utils/hub":15,"events":16,"preact":17}],2:[function(require,module,exports){
+},{"./pretty-simple-chart":11,"events":15,"preact":16}],2:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -549,7 +502,7 @@ var BoxBG = function (_React$Component) {
 
 exports.default = BoxBG;
 
-},{"preact":17}],3:[function(require,module,exports){
+},{"preact":16}],3:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -593,9 +546,7 @@ var Box = function () {
         'svg',
         _extends({
           className: 'ps-chart ps-line-box',
-          style: { top: 0, left: yLabelWidth, width: width, height: height },
-          x: '0px',
-          y: '0px'
+          style: { top: 0, left: yLabelWidth, width: width, height: height }
         }, { viewBox: viewBox }),
         React.createElement(_boxBg2.default, { conf: conf }),
         this.props.children
@@ -608,14 +559,12 @@ var Box = function () {
 
 exports.default = Box;
 
-},{"./box-bg":2,"preact":17}],4:[function(require,module,exports){
+},{"./box-bg":2,"preact":16}],4:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -655,7 +604,6 @@ var Line = function () {
 
       var stack = this.props.conf.stack;
       var _props = this.props,
-          line = _props.line,
           color = _props.color,
           thickness = _props.thickness,
           toggleRow = _props.toggleRow;
@@ -664,24 +612,22 @@ var Line = function () {
           name = _props$data.name;
 
 
-      var onMouseOver = function onMouseOver(e) {
-        _this.props.conf.innerHub.emit('line:over', {
-          name: _this.props.data.name,
-          color: _this.props.data.color,
-          e: e
-        });
-      };
-
       return React.createElement(
         'g',
-        _extends({
-          id: name + id }, { onMouseOver: onMouseOver }, { key: name }),
+        { id: name + id, key: name },
         React.createElement('path', {
           onMouseOver: function onMouseOver() {
-            return toggleRow(id, true);
+            return _this.hub.emit('toggleRow', { id: id, selecting: true });
           },
-          fill: stack ? color : 'none', d: this.lineValue, style: 'stroke:' + color + ';stroke-width:' + thickness })
+          fill: stack ? color : 'none',
+          d: this.lineValue,
+          style: { stroke: color, strokeWidth: thickness } })
       );
+    }
+  }, {
+    key: 'hub',
+    get: function get() {
+      return this.props.conf.innerHub;
     }
   }, {
     key: 'lineValue',
@@ -715,7 +661,7 @@ var Line = function () {
 
 exports.default = Line;
 
-},{"preact":17}],5:[function(require,module,exports){
+},{"preact":16}],5:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -764,7 +710,7 @@ var RowItemContainer = function () {
 
 exports.default = RowItemContainer;
 
-},{"preact":17}],6:[function(require,module,exports){
+},{"preact":16}],6:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -787,6 +733,8 @@ var RowItem = function () {
   _createClass(RowItem, [{
     key: 'render',
     value: function render() {
+      var _this = this;
+
       var _props$data = this.props.data,
           name = _props$data.name,
           color = _props$data.color,
@@ -804,7 +752,7 @@ var RowItem = function () {
         {
           className: 'ps-chart ps-row-item ' + additionalClassName,
           onMouseOver: function onMouseOver() {
-            return toggleRow(id, true);
+            return _this.hub.emit('toggleRow', { id: id, selecting: true });
           } },
         React.createElement(
           'div',
@@ -823,6 +771,11 @@ var RowItem = function () {
         )
       );
     }
+  }, {
+    key: 'hub',
+    get: function get() {
+      return this.props.conf.innerHub;
+    }
   }]);
 
   return RowItem;
@@ -830,7 +783,7 @@ var RowItem = function () {
 
 exports.default = RowItem;
 
-},{"preact":17}],7:[function(require,module,exports){
+},{"preact":16}],7:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -920,7 +873,7 @@ var XLabelContainer = function (_React$Component) {
 
 exports.default = XLabelContainer;
 
-},{"./x-label":8,"preact":17}],8:[function(require,module,exports){
+},{"./x-label":8,"preact":16}],8:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1004,7 +957,7 @@ var XLabel = function (_React$Component) {
 
 exports.default = XLabel;
 
-},{"preact":17}],9:[function(require,module,exports){
+},{"preact":16}],9:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1075,7 +1028,7 @@ var YLabelContainer = function () {
 
 exports.default = YLabelContainer;
 
-},{"./y-label":10,"preact":17}],10:[function(require,module,exports){
+},{"./y-label":10,"preact":16}],10:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1125,28 +1078,21 @@ var YLabel = function () {
 
 exports.default = YLabel;
 
-},{"preact":17}],11:[function(require,module,exports){
+},{"preact":16}],11:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.ChartComponent = undefined;
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-exports.renderChart = renderChart;
-
 var _preact = require('preact');
 
-var _hub = require('./utils/hub');
-
-var _hub2 = _interopRequireDefault(_hub);
-
 var _events = require('events');
-
-var _index = require('../index');
 
 var _chartData = require('./models/chart-data');
 
@@ -1178,22 +1124,49 @@ var _rowItem2 = _interopRequireDefault(_rowItem);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var React = { Component: _preact.Component, cloneElement: _preact.cloneElement, createElement: _preact.h };
 var ReactDOM = { render: _preact.render };
 
 var waitCount = 0;
 
-function renderChart(domID, conf) {
-  (0, _preact.render)(React.createElement(ChartComponent, { conf: conf }), document.querySelector('#' + domID));
-}
+var PrettySimpleChart = function () {
+  function PrettySimpleChart(domID, conf) {
+    _classCallCheck(this, PrettySimpleChart);
 
-var ChartComponent = function (_React$Component) {
+    this.conf = conf;
+    this.domID = domID;
+    this.hub = new _events.EventEmitter();
+  }
+
+  _createClass(PrettySimpleChart, [{
+    key: 'add',
+    value: function add(_ref) {
+      var data = _ref.data,
+          xLabel = _ref.xLabel;
+
+      this.hub.emit('send', { type: 'add', data: data, xLabel: xLabel });
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      (0, _preact.render)(React.createElement(ChartComponent, { hub: this.hub, conf: this.conf }), document.querySelector('#' + this.domID));
+
+      return this;
+    }
+  }]);
+
+  return PrettySimpleChart;
+}();
+
+exports.default = PrettySimpleChart;
+
+var ChartComponent = exports.ChartComponent = function (_React$Component) {
   _inherits(ChartComponent, _React$Component);
 
   function ChartComponent() {
@@ -1207,24 +1180,29 @@ var ChartComponent = function (_React$Component) {
     value: function componentWillMount() {
       var _this2 = this;
 
+      var hub = this.props.hub;
       var _props$conf = this.props.conf,
-          name = _props$conf.name,
           data = _props$conf.data,
           size = _props$conf.size,
           stack = _props$conf.stack,
           xLabels = _props$conf.xLabels;
 
+      this.props.conf.innerHub = this.innerHub;
 
       this.state = {
         data: new _chartData2.default(data, size, stack),
         xLabels: (xLabels || []).concat(),
         wait: 0,
-        innerHub: new _events.EventEmitter(),
         selectedID: -1
       };
 
-      _hub2.default.on(name, function (e) {
+      hub.on('send', function (e) {
         return _this2.receive(e);
+      });
+      this.innerHub.on('toggleRow', function (_ref2) {
+        var id = _ref2.id,
+            selecting = _ref2.selecting;
+        return _this2.toggleRow(id, selecting);
       });
     }
   }, {
@@ -1275,7 +1253,6 @@ var ChartComponent = function (_React$Component) {
           yLabelWidth = _props$conf2.yLabelWidth,
           xLabelHeight = _props$conf2.xLabelHeight;
 
-      conf.innerHub = this.state.innerHub;
 
       return React.createElement(
         'div',
@@ -1300,10 +1277,13 @@ var ChartComponent = function (_React$Component) {
       );
     }
   }, {
+    key: 'innerHub',
+    get: function get() {
+      return this._innerHub || (this._innerHub = new _events.EventEmitter());
+    }
+  }, {
     key: 'lines',
     get: function get() {
-      var _this4 = this;
-
       var conf = this.props.conf;
       var selectedID = this.state.selectedID;
 
@@ -1317,9 +1297,6 @@ var ChartComponent = function (_React$Component) {
         var color = strong && selectedID !== row.id ? '#bdc3c7' : row.color;
 
         var lineConfiguration = {
-          toggleRow: function toggleRow() {
-            return _this4.toggleRow.apply(_this4, arguments);
-          },
           data: row,
           color: color,
           conf: conf
@@ -1327,15 +1304,17 @@ var ChartComponent = function (_React$Component) {
 
         if (conf.stack) {
           lineConfiguration.line = row.stack;
+          lineConfiguration.thickness = 0;
 
           ls.push(React.createElement(_line2.default, lineConfiguration));
         } else {
           lineConfiguration.line = row.data;
 
           if (strong && selectedID === row.id) {
-            lineConfiguration.thickness = 3;
+            lineConfiguration.thickness = 4;
             selectedLine = React.createElement(_line2.default, lineConfiguration);
           } else {
+            lineConfiguration.thickness = 2;
             ls.push(React.createElement(_line2.default, lineConfiguration));
           }
         }
@@ -1348,8 +1327,6 @@ var ChartComponent = function (_React$Component) {
   }, {
     key: 'rowItems',
     get: function get() {
-      var _this5 = this;
-
       var conf = this.props.conf;
       var selectedID = this.state.selectedID;
       var yLabelFormat = conf.yLabelFormat;
@@ -1362,9 +1339,6 @@ var ChartComponent = function (_React$Component) {
         yLabelFormat && (value = yLabelFormat(value));
 
         items.push(React.createElement(_rowItem2.default, {
-          toggleRow: function toggleRow() {
-            return _this5.toggleRow.apply(_this5, arguments);
-          },
           selected: data.id === selectedID,
           value: value,
           data: data,
@@ -1379,9 +1353,7 @@ var ChartComponent = function (_React$Component) {
   return ChartComponent;
 }(React.Component);
 
-exports.default = ChartComponent;
-
-},{"../index":1,"./components/box":3,"./components/line":4,"./components/row-item":6,"./components/row-item-container":5,"./components/x-label-container":7,"./components/y-label-container":9,"./models/chart-data":12,"./utils/hub":15,"events":16,"preact":17}],12:[function(require,module,exports){
+},{"./components/box":3,"./components/line":4,"./components/row-item":6,"./components/row-item-container":5,"./components/x-label-container":7,"./components/y-label-container":9,"./models/chart-data":12,"events":15,"preact":16}],12:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1598,17 +1570,6 @@ function numToColor(n) {
 }
 
 },{}],15:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _events = require('events');
-
-exports.default = new _events.EventEmitter();
-
-},{"events":16}],16:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -1912,7 +1873,7 @@ function isUndefined(arg) {
   return arg === void 0;
 }
 
-},{}],17:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 !function(global, factory) {
     'object' == typeof exports && 'undefined' != typeof module ? factory(exports) : 'function' == typeof define && define.amd ? define([ 'exports' ], factory) : factory(global.preact = global.preact || {});
 }(this, function(exports) {
