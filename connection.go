@@ -72,7 +72,7 @@ func (c Connector) connectLocal() {
 				c.Q <- ResultRaw(store)
 				store = ""
 			}
-		}else{
+		} else {
 			store += scanner.Text() + "\n"
 		}
 	}

@@ -1,1881 +1,77 @@
-(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-'use strict';
+/******/ (function(modules) { // webpackBootstrap
+/******/ 	// The module cache
+/******/ 	var installedModules = {};
+
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+
+/******/ 		// Check if module is in cache
+/******/ 		if(installedModules[moduleId])
+/******/ 			return installedModules[moduleId].exports;
+
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = installedModules[moduleId] = {
+/******/ 			i: moduleId,
+/******/ 			l: false,
+/******/ 			exports: {}
+/******/ 		};
+
+/******/ 		// Execute the module function
+/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+
+/******/ 		// Flag the module as loaded
+/******/ 		module.l = true;
+
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+
+
+/******/ 	// expose the modules object (__webpack_modules__)
+/******/ 	__webpack_require__.m = modules;
+
+/******/ 	// expose the module cache
+/******/ 	__webpack_require__.c = installedModules;
+
+/******/ 	// identity function for calling harmony imports with the correct context
+/******/ 	__webpack_require__.i = function(value) { return value; };
+
+/******/ 	// define getter function for harmony exports
+/******/ 	__webpack_require__.d = function(exports, name, getter) {
+/******/ 		if(!__webpack_require__.o(exports, name)) {
+/******/ 			Object.defineProperty(exports, name, {
+/******/ 				configurable: false,
+/******/ 				enumerable: true,
+/******/ 				get: getter
+/******/ 			});
+/******/ 		}
+/******/ 	};
+
+/******/ 	// getDefaultExport function for compatibility with non-harmony modules
+/******/ 	__webpack_require__.n = function(module) {
+/******/ 		var getter = module && module.__esModule ?
+/******/ 			function getDefault() { return module['default']; } :
+/******/ 			function getModuleExports() { return module; };
+/******/ 		__webpack_require__.d(getter, 'a', getter);
+/******/ 		return getter;
+/******/ 	};
+
+/******/ 	// Object.prototype.hasOwnProperty.call
+/******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
+
+/******/ 	// __webpack_public_path__
+/******/ 	__webpack_require__.p = "js";
+
+/******/ 	// Load entry module and return exports
+/******/ 	return __webpack_require__(__webpack_require__.s = 15);
+/******/ })
+/************************************************************************/
+/******/ ([
+/* 0 */
+/***/ function(module, exports, __webpack_require__) {
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.Configure = undefined;
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _preact = require('preact');
-
-var _prettySimpleChart = require('./pretty-simple-chart');
-
-var _prettySimpleChart2 = _interopRequireDefault(_prettySimpleChart);
-
-var _events = require('events');
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var c3 = window.c3;
-var req = window.superagent;
-
-var React = { Component: _preact.Component, cloneElement: _preact.cloneElement, createElement: _preact.h };
-
-var Configure = exports.Configure = function () {
-  function Configure() {
-    _classCallCheck(this, Configure);
-  }
-
-  _createClass(Configure, null, [{
-    key: 'size',
-    set: function set(v) {
-      this._dataArray = [];
-      for (var i = v; i--;) {
-        this._dataArray.push(0);
-      }
-      this._size = v;
-    },
-    get: function get() {
-      return this._size;
-    }
-  }, {
-    key: 'dataArray',
-    get: function get() {
-      return this._dataArray.concat();
-    }
-  }]);
-
-  return Configure;
-}();
-
-var Watcher = function () {
-  function Watcher(_ref) {
-    var size = _ref.size,
-        wait = _ref.wait,
-        tasks = _ref.tasks,
-        totalCPU = _ref.totalCPU,
-        totalMemory = _ref.totalMemory,
-        CPUGraph = _ref.CPUGraph,
-        memoryGraph = _ref.memoryGraph,
-        initialData = _ref.initialData,
-        names = _ref.names,
-        realNames = _ref.realNames,
-        min = _ref.min;
-
-    _classCallCheck(this, Watcher);
-
-    this.conf = {
-      tasks: tasks,
-      totalCPU: totalCPU,
-      totalMemory: totalMemory,
-      CPUGraph: CPUGraph,
-      memoryGraph: memoryGraph,
-      initialData: initialData,
-      names: names,
-      realNames: realNames,
-      min: min
-    };
-
-    Configure.wait = wait;
-    Configure.size = size;
-    Configure.min = min;
-    Configure.keyMap = {};
-    realNames.forEach(function (n, i) {
-      Configure.keyMap[n] = i;
-    });
-
-    this.store = new DataStore();
-  }
-
-  _createClass(Watcher, [{
-    key: 'start',
-    value: function start() {
-      this.initialize();
-    }
-  }, {
-    key: 'initialize',
-    value: function initialize() {
-      var _this = this;
-
-      var keyMap = Configure.keyMap;
-
-
-      this.timeList = [];
-      var processList = {};
-      var memoryList = {
-        // 1: { id: 1, color: '#bdc3c7', name: 'free', data: [] },
-        2: { id: 2, name: 'used', data: [] },
-        3: { id: 3, name: 'buffers', data: [] }
-      };
-
-      var CPUList = {
-        1: { id: 1, name: 'User', data: [] },
-        2: { id: 2, name: 'System', data: [] },
-        3: { id: 3, name: 'Nice', data: [] },
-        // 4: { id: 4, color: '#bdc3c7', name: 'Idle', data: [] },
-        5: { id: 5, name: 'IOWait', data: [] },
-        6: { id: 6, name: 'HardwareInterrupt', data: [] },
-        7: { id: 7, name: 'SoftwareInterrupt', data: [] },
-        8: { id: 8, name: 'StolenTime', data: [] }
-      };
-
-      this.conf.initialData.forEach(function (_ref2, i) {
-        var memory = _ref2.memory,
-            cpu = _ref2.cpu,
-            time = _ref2.time,
-            processes = _ref2.processes,
-            rowPositions = _ref2.rowPositions;
-
-        // manage time
-        _this.timeList.push(time * 1000 + '');
-
-        var Total = memory.Total,
-            Used = memory.Used,
-            Free = memory.Free,
-            Buffers = memory.Buffers;
-
-
-        _this.totalMemory = +Total;
-        // memoryList[1].data.push(Math.round(+Free / this.totalMemory * 1000) / 10)
-        memoryList[2].data.push(Math.round(+Used / _this.totalMemory * 1000) / 10);
-        memoryList[3].data.push(Math.round(+Buffers / _this.totalMemory * 1000) / 10);
-
-        var User = cpu.User,
-            System = cpu.System,
-            Nice = cpu.Nice,
-            Idle = cpu.Idle,
-            IOWait = cpu.IOWait,
-            HardwareInterrupt = cpu.HardwareInterrupt,
-            SoftwareInterrupt = cpu.SoftwareInterrupt,
-            StolenTime = cpu.StolenTime;
-
-
-        CPUList[1].data.push(User);
-        CPUList[2].data.push(System);
-        CPUList[3].data.push(Nice);
-        // CPUList[4].data.push(Idle)
-        CPUList[5].data.push(IOWait);
-        CPUList[6].data.push(HardwareInterrupt);
-        CPUList[7].data.push(SoftwareInterrupt);
-        CPUList[8].data.push(StolenTime);
-
-        if (!processes) {
-          return {};
-        }
-
-        // manage processes
-        processes.forEach(function (process) {
-          var pid = process[rowPositions.PID];
-          var cmd = process[rowPositions.COMMAND];
-          if (cmd.indexOf('/top') != -1 || cmd === 'top') {
-            return;
-          }
-
-          var pidQueue = processList[pid] ? processList[pid] : processList[pid] = {
-            pid: pid,
-            cmd: cmd,
-            rowPositions: rowPositions,
-            data: Configure.dataArray
-          };
-
-          pidQueue.data[i] = { process: process };
-        });
-      });
-
-      var gen = function gen(o) {
-        return Object.assign({}, {
-          size: Configure.size,
-          xLabels: _this.timeList,
-          stack: true,
-          w: 600,
-          h: 300,
-          xLabelHeight: 70,
-          xSize: Configure.size,
-          xLabelRotate: 90,
-          yLabelWidth: 50,
-          yMax: 100,
-          yLabelStep: 20,
-          rowItemWidth: 200,
-          yLabelFormat: function yLabelFormat(v) {
-            return v + ' %';
-          },
-          xLabelFormat: function xLabelFormat(v) {
-            return dateString(v);
-          }
-        }, o);
-      };
-
-      var totalCPU = new _prettySimpleChart2.default('totalCPU', gen({
-        name: 'totalCPU',
-        data: CPUList
-      })).render();
-
-      var totalMemory = new _prettySimpleChart2.default('totalMemory', gen({
-        name: 'totalMemory',
-        data: memoryList
-      })).render();
-
-      var CPUGraph = new _prettySimpleChart2.default('CPUGraph', gen({
-        name: 'PerCPU',
-        data: pickRow('%CPU', processList),
-        stack: false
-      })).render();
-
-      var memoryGraph = new _prettySimpleChart2.default('memoryGraph', gen({
-        name: 'PerMemory',
-        data: pickRow('%MEM', processList)
-      })).render();
-
-      setInterval(function () {
-        req.get('/r').set('Accept', 'application/json').end(function (err, res) {
-          var _res$body = res.body,
-              processes = _res$body.processes,
-              rowPositions = _res$body.rowPositions,
-              time = _res$body.time,
-              cpu = _res$body.cpu,
-              memory = _res$body.memory;
-
-          time *= 1000;
-          var picked = pick(processes, rowPositions.PID, rowPositions.COMMAND, [rowPositions['%CPU'], rowPositions['%MEM']]);
-
-          CPUGraph.add({
-            data: picked[rowPositions['%CPU']],
-            xLabel: time
-          });
-
-          memoryGraph.add({
-            type: 'add', data: picked[rowPositions['%MEM']],
-            xLabel: time
-          });
-
-          var memoryList = {
-            // 1: { id: 1, color: '#bdc3c7', name: 'free', value: Math.round(memory.Free / this.totalMemory * 1000) / 10 },
-            2: {
-              id: 2,
-              color: '#e74c3c',
-              name: 'used',
-              value: Math.round(memory.Used / _this.totalMemory * 1000) / 10
-            },
-            3: {
-              id: 3,
-              color: '#9b59b6',
-              name: 'buffers',
-              value: Math.round(memory.Buffers / _this.totalMemory * 1000) / 10
-            }
-          };
-
-          totalMemory.add({
-            data: memoryList,
-            xLabel: time
-          });
-
-          var CPUList = {
-            1: { id: 1, name: 'User', value: cpu.User },
-            2: { id: 2, name: 'System', value: cpu.System },
-            3: { id: 3, name: 'Nice', value: cpu.Nice },
-            // 4: { id: 4, name: 'Idle', value: cpu.Idle },
-            5: { id: 5, name: 'IOWait', value: cpu.IOWait },
-            6: {
-              id: 6,
-              name: 'HardwareInterrupt',
-              value: cpu.HardwareInterrupt
-            },
-            7: {
-              id: 7,
-              name: 'SoftwareInterrupt',
-              value: cpu.SoftwareInterrupt
-            },
-            8: { id: 8, name: 'StolenTime', value: cpu.StolenTime }
-          };
-
-          totalCPU.add({
-            data: CPUList,
-            xLabel: time
-          });
-        });
-      }, Configure.wait * 1000);
-    }
-  }]);
-
-  return Watcher;
-}();
-
-function pickRow(rowName, processList) {
-  var re = {};
-
-  var _loop = function _loop(i) {
-    var now = processList[i];
-    if (now.cmd.indexOf('top') !== -1) {
-      return 'continue';
-    }
-    var pos = now.rowPositions[rowName];
-    re[i] = {
-      id: +now.pid,
-      name: now.cmd,
-      data: now.data.map(function (d) {
-        return d.process ? +d.process[pos] : 0;
-      })
-    };
-  };
-
-  for (var i in processList) {
-    var _ret = _loop(i);
-
-    if (_ret === 'continue') continue;
-  }
-  return re;
-}
-
-function dateString(unixTime) {
-  var d = new Date(+unixTime);
-  return double(d.getHours()) + ':' + double(d.getMinutes()) + ':' + double(d.getSeconds());
-}
-
-function double(n) {
-  return (n < 10 ? '0' : '') + n;
-}
-
-function pick(processes, idPosition, namePosition, valuePositions) {
-  var re = {};
-  processes.forEach(function (process) {
-    valuePositions.forEach(function (valuePosition) {
-      if (!re[valuePosition]) {
-        re[valuePosition] = {};
-      }
-      var id = process[idPosition];
-      if (process[namePosition].indexOf('top') !== -1) {
-        return;
-      }
-      re[valuePosition][id] = {
-        id: +process[idPosition],
-        name: process[namePosition],
-        value: +process[valuePosition]
-      };
-    });
-  });
-  return re;
-}
-
-var DataStore = function () {
-  function DataStore() {
-    _classCallCheck(this, DataStore);
-
-    this.store = {};
-  }
-
-  _createClass(DataStore, [{
-    key: 'column',
-    value: function column(name) {
-      var re = {};
-      for (var i in this.store) {
-        re.push({
-          id: +this.store[i].pid,
-          name: this.store[i].cmd,
-          data: this.store[i].getByName(name)
-        });
-      }
-      return re;
-    }
-  }, {
-    key: 'process',
-    value: function process(pid, cmd) {
-      if (this.store[pid]) {
-        return this.store[pid];
-      }
-
-      return this.store[pid] = new DataSet({ pid: pid, cmd: cmd });
-    }
-  }]);
-
-  return DataStore;
-}();
-
-window.Watcher = Watcher;
-
-},{"./pretty-simple-chart":11,"events":15,"preact":16}],2:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _preact = require('preact');
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var React = { Component: _preact.Component, cloneElement: _preact.cloneElement, createElement: _preact.h };
-
-var BoxBG = function (_React$Component) {
-  _inherits(BoxBG, _React$Component);
-
-  function BoxBG() {
-    _classCallCheck(this, BoxBG);
-
-    return _possibleConstructorReturn(this, (BoxBG.__proto__ || Object.getPrototypeOf(BoxBG)).apply(this, arguments));
-  }
-
-  _createClass(BoxBG, [{
-    key: 'shouldComponentUpdate',
-    value: function shouldComponentUpdate() {
-      return false;
-    }
-  }, {
-    key: 'render',
-    value: function render() {
-      return React.createElement(
-        'g',
-        null,
-        this.horizontalLines,
-        this.verticalLines
-      );
-    }
-  }, {
-    key: 'horizontalLines',
-    get: function get() {
-      var conf = this.props.conf;
-      var w = conf.w,
-          h = conf.h,
-          yMax = conf.yMax,
-          yLabelStep = conf.yLabelStep;
-
-
-      var l = Math.round(yMax / yLabelStep);
-      var yStep = h / (yMax / yLabelStep);
-
-      var ls = [];
-
-      for (var i = 0; i <= l; i++) {
-        var y = yStep * i;
-
-        ls.push(React.createElement('line', {
-          x1: 0,
-          x2: w,
-          y1: y,
-          y2: y,
-          style: { stroke: '#ecf0f1', strokeWidth: 1 }
-        }));
-      }
-
-      return ls;
-    }
-  }, {
-    key: 'verticalLines',
-    get: function get() {
-      var _props$conf = this.props.conf,
-          w = _props$conf.w,
-          h = _props$conf.h,
-          xSize = _props$conf.xSize;
-
-
-      var xStep = w / (xSize - 1);
-
-      var ls = [];
-
-      for (var i = 0; i < xSize; i++) {
-        var x = xStep * i;
-
-        ls.push(React.createElement('line', {
-          x1: x,
-          x2: x,
-          y1: 0,
-          y2: h,
-          style: { stroke: '#ecf0f1', strokeWidth: 1, strokeDasharray: "2, 4" }
-        }));
-      }
-
-      return ls;
-    }
-  }]);
-
-  return BoxBG;
-}(React.Component);
-
-exports.default = BoxBG;
-
-},{"preact":16}],3:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _preact = require('preact');
-
-var _boxBg = require('./box-bg');
-
-var _boxBg2 = _interopRequireDefault(_boxBg);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var React = { Component: _preact.Component, cloneElement: _preact.cloneElement, createElement: _preact.h };
-
-var Box = function () {
-  function Box() {
-    _classCallCheck(this, Box);
-  }
-
-  _createClass(Box, [{
-    key: 'render',
-    value: function render() {
-      var conf = this.props.conf;
-      var w = conf.w,
-          h = conf.h,
-          yLabelWidth = conf.yLabelWidth;
-
-      var width = w;
-      var height = h;
-      var viewBox = '0 0 ' + w + ' ' + h;
-
-      return React.createElement(
-        'svg',
-        _extends({
-          className: 'ps-chart ps-line-box',
-          style: { top: 0, left: yLabelWidth, width: width, height: height }
-        }, { viewBox: viewBox }),
-        React.createElement(_boxBg2.default, { conf: conf }),
-        this.props.children
-      );
-    }
-  }]);
-
-  return Box;
-}();
-
-exports.default = Box;
-
-},{"./box-bg":2,"preact":16}],4:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _preact = require('preact');
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var React = { Component: _preact.Component, cloneElement: _preact.cloneElement, createElement: _preact.h };
-
-var Line = function () {
-  function Line() {
-    _classCallCheck(this, Line);
-  }
-
-  _createClass(Line, [{
-    key: 'computeX',
-    value: function computeX(position, length) {
-      var w = this.props.conf.w;
-
-
-      return (w + 1) / (length - 1) * position;
-    }
-  }, {
-    key: 'computeY',
-    value: function computeY(value) {
-      var _props$conf = this.props.conf,
-          h = _props$conf.h,
-          yMax = _props$conf.yMax;
-
-
-      return h - h * (value / yMax);
-    }
-  }, {
-    key: 'render',
-    value: function render() {
-      var _this = this;
-
-      var stack = this.props.conf.stack;
-      var _props = this.props,
-          color = _props.color,
-          thickness = _props.thickness,
-          toggleRow = _props.toggleRow;
-      var _props$data = this.props.data,
-          id = _props$data.id,
-          name = _props$data.name;
-
-
-      return React.createElement(
-        'g',
-        { id: name + id, key: name },
-        React.createElement('path', {
-          onMouseOver: function onMouseOver() {
-            return _this.hub.emit('toggleRow', { id: id, selecting: true });
-          },
-          fill: stack ? color : 'none',
-          d: this.lineValue,
-          style: { stroke: color, strokeWidth: thickness } })
-      );
-    }
-  }, {
-    key: 'hub',
-    get: function get() {
-      return this.props.conf.innerHub;
-    }
-  }, {
-    key: 'lineValue',
-    get: function get() {
-      var _props$conf2 = this.props.conf,
-          stack = _props$conf2.stack,
-          w = _props$conf2.w,
-          h = _props$conf2.h;
-      var line = this.props.line;
-
-
-      var start = -1;
-      var end = w + 1;
-
-      var d = 'M ' + start + ' ' + this.computeY(line[0]) + ' ';
-      var l = line.length;
-      for (var i = 1; i < l; i++) {
-        d += 'L ' + this.computeX(i, l) + ' ' + this.computeY(line[i]);
-      }
-
-      if (stack) {
-        d += 'L ' + end + ' ' + h + ' L ' + start + ' ' + h;
-      }
-
-      return d;
-    }
-  }]);
-
-  return Line;
-}();
-
-exports.default = Line;
-
-},{"preact":16}],5:[function(require,module,exports){
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _preact = require("preact");
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var React = { Component: _preact.Component, cloneElement: _preact.cloneElement, createElement: _preact.h };
-
-var RowItemContainer = function () {
-  function RowItemContainer() {
-    _classCallCheck(this, RowItemContainer);
-  }
-
-  _createClass(RowItemContainer, [{
-    key: "render",
-    value: function render() {
-      var _props$conf = this.props.conf,
-          w = _props$conf.w,
-          h = _props$conf.h,
-          xLabelHeight = _props$conf.xLabelHeight,
-          rowItemWidth = _props$conf.rowItemWidth;
-
-      return React.createElement(
-        "div",
-        {
-          className: "ps-chart ps-row-item-container",
-          style: {
-            top: 0,
-            left: w + xLabelHeight,
-            width: rowItemWidth,
-            height: h + xLabelHeight
-          } },
-        this.props.children
-      );
-    }
-  }]);
-
-  return RowItemContainer;
-}();
-
-exports.default = RowItemContainer;
-
-},{"preact":16}],6:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _preact = require('preact');
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var React = { Component: _preact.Component, cloneElement: _preact.cloneElement, createElement: _preact.h };
-
-var RowItem = function () {
-  function RowItem() {
-    _classCallCheck(this, RowItem);
-  }
-
-  _createClass(RowItem, [{
-    key: 'render',
-    value: function render() {
-      var _this = this;
-
-      var _props$data = this.props.data,
-          name = _props$data.name,
-          color = _props$data.color,
-          id = _props$data.id;
-      var _props = this.props,
-          toggleRow = _props.toggleRow,
-          value = _props.value,
-          selected = _props.selected;
-
-
-      var additionalClassName = selected ? 'ps-row-item-selected' : '';
-
-      return React.createElement(
-        'div',
-        {
-          className: 'ps-chart ps-row-item ' + additionalClassName,
-          onMouseOver: function onMouseOver() {
-            return _this.hub.emit('toggleRow', { id: id, selecting: true });
-          } },
-        React.createElement(
-          'div',
-          { className: 'ps-chart ps-row-item-color', style: { color: color } },
-          '\u25A0'
-        ),
-        React.createElement(
-          'div',
-          { className: 'ps-chart ps-row-item-name' },
-          name
-        ),
-        React.createElement(
-          'div',
-          { className: 'ps-chart ps-row-item-value' },
-          value
-        )
-      );
-    }
-  }, {
-    key: 'hub',
-    get: function get() {
-      return this.props.conf.innerHub;
-    }
-  }]);
-
-  return RowItem;
-}();
-
-exports.default = RowItem;
-
-},{"preact":16}],7:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _preact = require('preact');
-
-var _xLabel = require('./x-label');
-
-var _xLabel2 = _interopRequireDefault(_xLabel);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var React = { Component: _preact.Component, cloneElement: _preact.cloneElement, createElement: _preact.h };
-
-var XLabelContainer = function (_React$Component) {
-  _inherits(XLabelContainer, _React$Component);
-
-  function XLabelContainer() {
-    _classCallCheck(this, XLabelContainer);
-
-    return _possibleConstructorReturn(this, (XLabelContainer.__proto__ || Object.getPrototypeOf(XLabelContainer)).apply(this, arguments));
-  }
-
-  _createClass(XLabelContainer, [{
-    key: 'render',
-    value: function render() {
-      var conf = this.props.conf;
-      var w = conf.w,
-          h = conf.h,
-          yLabelWidth = conf.yLabelWidth,
-          xLabelHeight = conf.xLabelHeight;
-
-
-      return React.createElement(
-        'div',
-        {
-          className: 'ps-chart ps-x-label-container',
-          style: {
-            conf: conf,
-            top: h,
-            left: yLabelWidth,
-            width: w,
-            height: xLabelHeight
-          } },
-        this.labels
-      );
-    }
-  }, {
-    key: 'labels',
-    get: function get() {
-      var conf = this.props.conf;
-      var w = conf.w,
-          xSize = conf.xSize,
-          xLabelFormat = conf.xLabelFormat;
-
-
-      var xStep = w / (xSize - 1);
-
-      var ls = [];
-
-      for (var i = 0; i < xSize; i++) {
-        var xl = this.props.labels[i] || 0;
-        ls.push(React.createElement(_xLabel2.default, {
-          conf: conf,
-          label: xLabelFormat ? xLabelFormat(xl) : xl,
-          left: xStep * i,
-          top: 0
-        }));
-      }
-
-      return ls;
-    }
-  }]);
-
-  return XLabelContainer;
-}(React.Component);
-
-exports.default = XLabelContainer;
-
-},{"./x-label":8,"preact":16}],8:[function(require,module,exports){
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _preact = require("preact");
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var React = { Component: _preact.Component, cloneElement: _preact.cloneElement, createElement: _preact.h };
-
-var XLabel = function (_React$Component) {
-  _inherits(XLabel, _React$Component);
-
-  function XLabel() {
-    _classCallCheck(this, XLabel);
-
-    return _possibleConstructorReturn(this, (XLabel.__proto__ || Object.getPrototypeOf(XLabel)).apply(this, arguments));
-  }
-
-  _createClass(XLabel, [{
-    key: "componentDidMount",
-    value: function componentDidMount() {
-      this.reset();
-    }
-  }, {
-    key: "reset",
-    value: function reset() {
-      var _this2 = this;
-
-      if (this.props.centering) {
-        setTimeout(function () {
-          _this2.setState({
-            offset: -_this2.innerLabel.clientWidth / 2
-          });
-        }, 0);
-      }
-    }
-  }, {
-    key: "render",
-    value: function render() {
-      var _this3 = this;
-
-      var _props = this.props,
-          left = _props.left,
-          label = _props.label;
-
-      var labelRotation = this.props.conf.xLabelRotate || 0;
-
-      return React.createElement(
-        "div",
-        {
-          className: "ps-chart ps-x-label",
-          style: {
-            left: left,
-            transform: "rotateZ(" + labelRotation + "deg)"
-          } },
-        React.createElement(
-          "div",
-          {
-            className: "ps-chart ps-x-label-inner",
-            ref: function ref(l) {
-              return _this3.innerLabel = l;
-            },
-            style: { left: this.state.offset } },
-          label
-        )
-      );
-    }
-  }]);
-
-  return XLabel;
-}(React.Component);
-
-exports.default = XLabel;
-
-},{"preact":16}],9:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _preact = require('preact');
-
-var _yLabel = require('./y-label');
-
-var _yLabel2 = _interopRequireDefault(_yLabel);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var React = { Component: _preact.Component, cloneElement: _preact.cloneElement, createElement: _preact.h };
-
-var YLabelContainer = function () {
-  function YLabelContainer() {
-    _classCallCheck(this, YLabelContainer);
-  }
-
-  _createClass(YLabelContainer, [{
-    key: 'render',
-    value: function render() {
-      return React.createElement(
-        'div',
-        {
-          className: 'ps-chart ps-y-label-container',
-          style: {
-            top: 0,
-            left: 0
-          } },
-        this.labels
-      );
-    }
-  }, {
-    key: 'labels',
-    get: function get() {
-      var conf = this.props.conf;
-      var h = conf.h,
-          yMax = conf.yMax,
-          yLabelStep = conf.yLabelStep;
-
-
-      var l = Math.round(yMax / yLabelStep);
-      var yStep = h / (yMax / yLabelStep);
-
-      var ls = [];
-
-      for (var i = 0; i <= l; i++) {
-        ls.push(React.createElement(_yLabel2.default, {
-          conf: conf,
-          label: i * yLabelStep,
-          top: h - yStep * i
-        }));
-      }
-
-      return ls;
-    }
-  }]);
-
-  return YLabelContainer;
-}();
-
-exports.default = YLabelContainer;
-
-},{"./y-label":10,"preact":16}],10:[function(require,module,exports){
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _preact = require("preact");
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var React = { Component: _preact.Component, cloneElement: _preact.cloneElement, createElement: _preact.h };
-
-var YLabel = function () {
-  function YLabel() {
-    _classCallCheck(this, YLabel);
-  }
-
-  _createClass(YLabel, [{
-    key: "render",
-    value: function render() {
-      var _props = this.props,
-          top = _props.top,
-          raw = _props.label;
-      var _props$conf = this.props.conf,
-          yLabelWidth = _props$conf.yLabelWidth,
-          yLabelFormat = _props$conf.yLabelFormat;
-
-      var label = yLabelFormat ? yLabelFormat(raw) : raw;
-
-      return React.createElement(
-        "div",
-        {
-          className: "ps-chart ps-y-label",
-          style: {
-            top: top,
-            width: yLabelWidth
-          } },
-        label
-      );
-    }
-  }]);
-
-  return YLabel;
-}();
-
-exports.default = YLabel;
-
-},{"preact":16}],11:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.ChartComponent = undefined;
-
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _preact = require('preact');
-
-var _events = require('events');
-
-var _chartData = require('./models/chart-data');
-
-var _chartData2 = _interopRequireDefault(_chartData);
-
-var _xLabelContainer = require('./components/x-label-container');
-
-var _xLabelContainer2 = _interopRequireDefault(_xLabelContainer);
-
-var _yLabelContainer = require('./components/y-label-container');
-
-var _yLabelContainer2 = _interopRequireDefault(_yLabelContainer);
-
-var _box = require('./components/box');
-
-var _box2 = _interopRequireDefault(_box);
-
-var _line = require('./components/line');
-
-var _line2 = _interopRequireDefault(_line);
-
-var _rowItemContainer = require('./components/row-item-container');
-
-var _rowItemContainer2 = _interopRequireDefault(_rowItemContainer);
-
-var _rowItem = require('./components/row-item');
-
-var _rowItem2 = _interopRequireDefault(_rowItem);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var React = { Component: _preact.Component, cloneElement: _preact.cloneElement, createElement: _preact.h };
-var ReactDOM = { render: _preact.render };
-
-var waitCount = 0;
-
-var PrettySimpleChart = function () {
-  function PrettySimpleChart(domID, conf) {
-    _classCallCheck(this, PrettySimpleChart);
-
-    this.conf = conf;
-    this.domID = domID;
-    this.hub = new _events.EventEmitter();
-  }
-
-  _createClass(PrettySimpleChart, [{
-    key: 'add',
-    value: function add(_ref) {
-      var data = _ref.data,
-          xLabel = _ref.xLabel;
-
-      this.hub.emit('send', { type: 'add', data: data, xLabel: xLabel });
-    }
-  }, {
-    key: 'render',
-    value: function render() {
-      (0, _preact.render)(React.createElement(ChartComponent, { hub: this.hub, conf: this.conf }), document.querySelector('#' + this.domID));
-
-      return this;
-    }
-  }]);
-
-  return PrettySimpleChart;
-}();
-
-exports.default = PrettySimpleChart;
-
-var ChartComponent = exports.ChartComponent = function (_React$Component) {
-  _inherits(ChartComponent, _React$Component);
-
-  function ChartComponent() {
-    _classCallCheck(this, ChartComponent);
-
-    return _possibleConstructorReturn(this, (ChartComponent.__proto__ || Object.getPrototypeOf(ChartComponent)).apply(this, arguments));
-  }
-
-  _createClass(ChartComponent, [{
-    key: 'componentWillMount',
-    value: function componentWillMount() {
-      var _this2 = this;
-
-      var hub = this.props.hub;
-      var _props$conf = this.props.conf,
-          data = _props$conf.data,
-          size = _props$conf.size,
-          stack = _props$conf.stack,
-          xLabels = _props$conf.xLabels;
-
-      this.props.conf.innerHub = this.innerHub;
-
-      this.state = {
-        data: new _chartData2.default(data, size, stack),
-        xLabels: (xLabels || []).concat(),
-        wait: 0,
-        selectedID: -1
-      };
-
-      hub.on('send', function (e) {
-        return _this2.receive(e);
-      });
-      this.innerHub.on('toggleRow', function (_ref2) {
-        var id = _ref2.id,
-            selecting = _ref2.selecting;
-        return _this2.toggleRow(id, selecting);
-      });
-    }
-  }, {
-    key: 'receive',
-    value: function receive(e) {
-      switch (e.type) {
-        case 'add':
-          this.add(e.data, e.xLabel);
-          break;
-        default:
-        //
-      }
-    }
-  }, {
-    key: 'add',
-    value: function add(newData, xLabel) {
-      this.state.data.add(newData);
-
-      var newLabels = this.state.xLabels;
-      if (xLabel) {
-        newLabels = newLabels.concat();
-        newLabels.shift();
-        newLabels.push(xLabel);
-      }
-
-      this.setState({
-        data: this.state.data,
-        xLabels: newLabels,
-        wait: waitCount
-      });
-    }
-  }, {
-    key: 'toggleRow',
-    value: function toggleRow(selectedID) {
-      var isSelecting = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
-
-      isSelecting ? this.setState({ selectedID: selectedID }) : this.setState({ selectedID: -1 });
-    }
-  }, {
-    key: 'render',
-    value: function render() {
-      var _this3 = this;
-
-      var conf = this.props.conf;
-      var _props$conf2 = this.props.conf,
-          w = _props$conf2.w,
-          h = _props$conf2.h,
-          yLabelWidth = _props$conf2.yLabelWidth,
-          xLabelHeight = _props$conf2.xLabelHeight;
-
-
-      return React.createElement(
-        'div',
-        _extends({ className: 'ps-chart ps-container' }, {
-          onClick: function onClick() {
-            return _this3.setState({ selectedID: -1 });
-          },
-          style: { width: w + yLabelWidth, height: h + xLabelHeight }
-        }),
-        React.createElement(_yLabelContainer2.default, { conf: conf }),
-        React.createElement(_xLabelContainer2.default, { conf: conf, labels: this.state.xLabels }),
-        React.createElement(
-          _box2.default,
-          { conf: conf },
-          this.lines
-        ),
-        React.createElement(
-          _rowItemContainer2.default,
-          { conf: conf },
-          this.rowItems
-        )
-      );
-    }
-  }, {
-    key: 'innerHub',
-    get: function get() {
-      return this._innerHub || (this._innerHub = new _events.EventEmitter());
-    }
-  }, {
-    key: 'lines',
-    get: function get() {
-      var conf = this.props.conf;
-      var selectedID = this.state.selectedID;
-
-      var strong = this.state.selectedID !== -1;
-
-      var ls = [];
-      var selectedLine = [];
-
-      for (var i in this.state.data.data) {
-        var row = this.state.data.data[i];
-        var color = strong && selectedID !== row.id ? '#bdc3c7' : row.color;
-
-        var lineConfiguration = {
-          data: row,
-          color: color,
-          conf: conf
-        };
-
-        if (conf.stack) {
-          lineConfiguration.line = row.stack;
-          lineConfiguration.thickness = 0;
-
-          ls.push(React.createElement(_line2.default, lineConfiguration));
-        } else {
-          lineConfiguration.line = row.data;
-
-          if (strong && selectedID === row.id) {
-            lineConfiguration.thickness = 4;
-            selectedLine = React.createElement(_line2.default, lineConfiguration);
-          } else {
-            lineConfiguration.thickness = 2;
-            ls.push(React.createElement(_line2.default, lineConfiguration));
-          }
-        }
-      }
-
-      selectedLine && ls.unshift(selectedLine);
-
-      return ls.reverse();
-    }
-  }, {
-    key: 'rowItems',
-    get: function get() {
-      var conf = this.props.conf;
-      var selectedID = this.state.selectedID;
-      var yLabelFormat = conf.yLabelFormat;
-
-      var items = [];
-
-      for (var i in this.state.data.data) {
-        var data = this.state.data.data[i];
-        var value = data.data[data.data.length - 1];
-        yLabelFormat && (value = yLabelFormat(value));
-
-        items.push(React.createElement(_rowItem2.default, {
-          selected: data.id === selectedID,
-          value: value,
-          data: data,
-          conf: conf
-        }));
-      }
-
-      return items.reverse();
-    }
-  }]);
-
-  return ChartComponent;
-}(React.Component);
-
-},{"./components/box":3,"./components/line":4,"./components/row-item":6,"./components/row-item-container":5,"./components/x-label-container":7,"./components/y-label-container":9,"./models/chart-data":12,"events":15,"preact":16}],12:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _chatRow = require('./chat-row');
-
-var _chatRow2 = _interopRequireDefault(_chatRow);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var ChartData = function () {
-  function ChartData(raw, size) {
-    var isStack = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
-
-    _classCallCheck(this, ChartData);
-
-    this.data = {};
-    this.size = size;
-    this.total = 0;
-    this.stack = [];
-    this.isStack = isStack;
-
-    for (var k in raw) {
-      var row = new _chatRow2.default(raw[k]);
-      if (row.total !== 0) {
-        this.data[k] = row;
-      }
-    }
-
-    if (!this.isStack) {
-      return;
-    }
-
-    for (var _k in this.data) {
-      this.data[_k].prepareStack();
-    }
-
-    for (var i = size; i--;) {
-      var pre = 0;
-      for (var _k2 in this.data) {
-        var now = this.data[_k2];
-        now.setInStack(i, pre + now.data[i]);
-        pre = now.stack[i];
-      }
-    }
-  }
-
-  _createClass(ChartData, [{
-    key: 'removeRow',
-    value: function removeRow(row) {
-      delete this.data[row.id];
-    }
-  }, {
-    key: 'add',
-    value: function add(newData) {
-      var pre = 0;
-
-      // 既存の row に反映
-      for (var k in this.data) {
-        var row = this.data[k];
-
-        var next = void 0;
-        if (newData[row.id]) {
-          next = newData[row.id].value;
-          delete newData[row.id];
-        } else {
-          next = 0;
-        }
-        pre += next;
-        row.shiftAndPush(next, pre);
-
-        row.removable && this.removeRow(row);
-      }
-
-      // 新しい row を追加
-      for (var i in newData) {
-        var _newData$i = newData[i],
-            id = _newData$i.id,
-            name = _newData$i.name,
-            value = _newData$i.value;
-
-        var data = [];
-        for (var _i = this.size - 1; _i--;) {
-          data[_i] = 0;
-        }
-        data.push(value);
-
-        var _row = new _chatRow2.default({ id: id, name: name, data: data });
-
-        if (_row.total === 0) {
-          continue;
-        }
-
-        if (this.isStack) {
-          var previousLine = void 0;
-          for (var ii = id; ii--;) {
-            if (this.data[ii]) {
-              previousLine = this.data[ii];
-              break;
-            }
-          }
-
-          _row.copyStackFrom(previousLine);
-          _row.stack[data.length - 1] += value;
-        }
-
-        this.data[id] = _row;
-      }
-    }
-  }]);
-
-  return ChartData;
-}();
-
-exports.default = ChartData;
-
-},{"./chat-row":13}],13:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _colorWheel = require('../utils/color-wheel');
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var ChartRow = function () {
-  function ChartRow(_ref) {
-    var id = _ref.id,
-        name = _ref.name,
-        data = _ref.data,
-        color = _ref.color;
-
-    _classCallCheck(this, ChartRow);
-
-    this.id = id;
-    this.name = name || '';
-    this.data = data || [];
-    this.stack = [];
-    this.total = this.data.reduce(function (a, n) {
-      return a + Math.floor(n * 10);
-    }, 0);
-
-    this.color = color || (0, _colorWheel.numToColor)(this.id);
-  }
-
-  _createClass(ChartRow, [{
-    key: 'copyStackFrom',
-    value: function copyStackFrom(previousLine) {
-      this.stack = (previousLine ? previousLine.stack : this.data).map(function (d) {
-        return d;
-      });
-    }
-  }, {
-    key: 'shiftAndPush',
-    value: function shiftAndPush(value, stackValue) {
-
-      var remove = this.data.shift();
-      this.total += Math.floor(value * 10) - Math.floor(remove * 10);
-      this.data.push(value);
-
-      this.stack.shift();
-      this.stack.push(stackValue);
-    }
-  }, {
-    key: 'prepareStack',
-    value: function prepareStack() {
-      this.stack = this.data.concat();
-    }
-  }, {
-    key: 'setInStack',
-    value: function setInStack(i, v) {
-      this.stack[i] = v;
-    }
-  }, {
-    key: 'removable',
-    get: function get() {
-      return this.total <= 0;
-    }
-  }]);
-
-  return ChartRow;
-}();
-
-exports.default = ChartRow;
-
-},{"../utils/color-wheel":14}],14:[function(require,module,exports){
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.textToColor = textToColor;
-exports.numToColor = numToColor;
-var colors = exports.colors = ['#0086AB', '#0098A6', '#00A199', '#009C7F', '#009767', '#009250', '#059C30', '#0BA60B', '#3BB111', '#6FBB18', '#A4C520', '#B6D11B', '#CBDC15', '#E4E80F', '#F3EB08', '#FFE600', '#FBDA02', '#F8CF05', '#F4C107', '#F1B709', '#EDAD0B', '#E58611', '#DE6316', '#D6431B', '#CF2620', '#C7243A', '#C42245', '#C01F52', '#BD1D5D', '#B91B67', '#B61972', '#AF1C74', '#A81F76', '#A12275', '#9A2475', '#932674', '#953095', '#7F3B97', '#6C469A', '#5F519C', '#5D639E', '#4D5FA3', '#3B60A8', '#2962AD', '#156BB2', '#007AB7', '#007CB5', '#0080B2', '#0081B0', '#0085AD'];
-
-var colorLength = colors.length;
-
-function textToColor(s) {
-  return colors[(s.charCodeAt(1) + s.charCodeAt(2)) % colorLength];
-}
-
-function numToColor(n) {
-  return colors[n * 8 % colorLength];
-}
-
-},{}],15:[function(require,module,exports){
-// Copyright Joyent, Inc. and other Node contributors.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the
-// "Software"), to deal in the Software without restriction, including
-// without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Software, and to permit
-// persons to whom the Software is furnished to do so, subject to the
-// following conditions:
-//
-// The above copyright notice and this permission notice shall be included
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
-// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
-// USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-function EventEmitter() {
-  this._events = this._events || {};
-  this._maxListeners = this._maxListeners || undefined;
-}
-module.exports = EventEmitter;
-
-// Backwards-compat with node 0.10.x
-EventEmitter.EventEmitter = EventEmitter;
-
-EventEmitter.prototype._events = undefined;
-EventEmitter.prototype._maxListeners = undefined;
-
-// By default EventEmitters will print a warning if more than 10 listeners are
-// added to it. This is a useful default which helps finding memory leaks.
-EventEmitter.defaultMaxListeners = 10;
-
-// Obviously not all Emitters should be limited to 10. This function allows
-// that to be increased. Set to zero for unlimited.
-EventEmitter.prototype.setMaxListeners = function(n) {
-  if (!isNumber(n) || n < 0 || isNaN(n))
-    throw TypeError('n must be a positive number');
-  this._maxListeners = n;
-  return this;
-};
-
-EventEmitter.prototype.emit = function(type) {
-  var er, handler, len, args, i, listeners;
-
-  if (!this._events)
-    this._events = {};
-
-  // If there is no 'error' event listener then throw.
-  if (type === 'error') {
-    if (!this._events.error ||
-        (isObject(this._events.error) && !this._events.error.length)) {
-      er = arguments[1];
-      if (er instanceof Error) {
-        throw er; // Unhandled 'error' event
-      } else {
-        // At least give some kind of context to the user
-        var err = new Error('Uncaught, unspecified "error" event. (' + er + ')');
-        err.context = er;
-        throw err;
-      }
-    }
-  }
-
-  handler = this._events[type];
-
-  if (isUndefined(handler))
-    return false;
-
-  if (isFunction(handler)) {
-    switch (arguments.length) {
-      // fast cases
-      case 1:
-        handler.call(this);
-        break;
-      case 2:
-        handler.call(this, arguments[1]);
-        break;
-      case 3:
-        handler.call(this, arguments[1], arguments[2]);
-        break;
-      // slower
-      default:
-        args = Array.prototype.slice.call(arguments, 1);
-        handler.apply(this, args);
-    }
-  } else if (isObject(handler)) {
-    args = Array.prototype.slice.call(arguments, 1);
-    listeners = handler.slice();
-    len = listeners.length;
-    for (i = 0; i < len; i++)
-      listeners[i].apply(this, args);
-  }
-
-  return true;
-};
-
-EventEmitter.prototype.addListener = function(type, listener) {
-  var m;
-
-  if (!isFunction(listener))
-    throw TypeError('listener must be a function');
-
-  if (!this._events)
-    this._events = {};
-
-  // To avoid recursion in the case that type === "newListener"! Before
-  // adding it to the listeners, first emit "newListener".
-  if (this._events.newListener)
-    this.emit('newListener', type,
-              isFunction(listener.listener) ?
-              listener.listener : listener);
-
-  if (!this._events[type])
-    // Optimize the case of one listener. Don't need the extra array object.
-    this._events[type] = listener;
-  else if (isObject(this._events[type]))
-    // If we've already got an array, just append.
-    this._events[type].push(listener);
-  else
-    // Adding the second element, need to change to array.
-    this._events[type] = [this._events[type], listener];
-
-  // Check for listener leak
-  if (isObject(this._events[type]) && !this._events[type].warned) {
-    if (!isUndefined(this._maxListeners)) {
-      m = this._maxListeners;
-    } else {
-      m = EventEmitter.defaultMaxListeners;
-    }
-
-    if (m && m > 0 && this._events[type].length > m) {
-      this._events[type].warned = true;
-      console.error('(node) warning: possible EventEmitter memory ' +
-                    'leak detected. %d listeners added. ' +
-                    'Use emitter.setMaxListeners() to increase limit.',
-                    this._events[type].length);
-      if (typeof console.trace === 'function') {
-        // not supported in IE 10
-        console.trace();
-      }
-    }
-  }
-
-  return this;
-};
-
-EventEmitter.prototype.on = EventEmitter.prototype.addListener;
-
-EventEmitter.prototype.once = function(type, listener) {
-  if (!isFunction(listener))
-    throw TypeError('listener must be a function');
-
-  var fired = false;
-
-  function g() {
-    this.removeListener(type, g);
-
-    if (!fired) {
-      fired = true;
-      listener.apply(this, arguments);
-    }
-  }
-
-  g.listener = listener;
-  this.on(type, g);
-
-  return this;
-};
-
-// emits a 'removeListener' event iff the listener was removed
-EventEmitter.prototype.removeListener = function(type, listener) {
-  var list, position, length, i;
-
-  if (!isFunction(listener))
-    throw TypeError('listener must be a function');
-
-  if (!this._events || !this._events[type])
-    return this;
-
-  list = this._events[type];
-  length = list.length;
-  position = -1;
-
-  if (list === listener ||
-      (isFunction(list.listener) && list.listener === listener)) {
-    delete this._events[type];
-    if (this._events.removeListener)
-      this.emit('removeListener', type, listener);
-
-  } else if (isObject(list)) {
-    for (i = length; i-- > 0;) {
-      if (list[i] === listener ||
-          (list[i].listener && list[i].listener === listener)) {
-        position = i;
-        break;
-      }
-    }
-
-    if (position < 0)
-      return this;
-
-    if (list.length === 1) {
-      list.length = 0;
-      delete this._events[type];
-    } else {
-      list.splice(position, 1);
-    }
-
-    if (this._events.removeListener)
-      this.emit('removeListener', type, listener);
-  }
-
-  return this;
-};
-
-EventEmitter.prototype.removeAllListeners = function(type) {
-  var key, listeners;
-
-  if (!this._events)
-    return this;
-
-  // not listening for removeListener, no need to emit
-  if (!this._events.removeListener) {
-    if (arguments.length === 0)
-      this._events = {};
-    else if (this._events[type])
-      delete this._events[type];
-    return this;
-  }
-
-  // emit removeListener for all listeners on all events
-  if (arguments.length === 0) {
-    for (key in this._events) {
-      if (key === 'removeListener') continue;
-      this.removeAllListeners(key);
-    }
-    this.removeAllListeners('removeListener');
-    this._events = {};
-    return this;
-  }
-
-  listeners = this._events[type];
-
-  if (isFunction(listeners)) {
-    this.removeListener(type, listeners);
-  } else if (listeners) {
-    // LIFO order
-    while (listeners.length)
-      this.removeListener(type, listeners[listeners.length - 1]);
-  }
-  delete this._events[type];
-
-  return this;
-};
-
-EventEmitter.prototype.listeners = function(type) {
-  var ret;
-  if (!this._events || !this._events[type])
-    ret = [];
-  else if (isFunction(this._events[type]))
-    ret = [this._events[type]];
-  else
-    ret = this._events[type].slice();
-  return ret;
-};
-
-EventEmitter.prototype.listenerCount = function(type) {
-  if (this._events) {
-    var evlistener = this._events[type];
-
-    if (isFunction(evlistener))
-      return 1;
-    else if (evlistener)
-      return evlistener.length;
-  }
-  return 0;
-};
-
-EventEmitter.listenerCount = function(emitter, type) {
-  return emitter.listenerCount(type);
-};
-
-function isFunction(arg) {
-  return typeof arg === 'function';
-}
-
-function isNumber(arg) {
-  return typeof arg === 'number';
-}
-
-function isObject(arg) {
-  return typeof arg === 'object' && arg !== null;
-}
-
-function isUndefined(arg) {
-  return arg === void 0;
-}
-
-},{}],16:[function(require,module,exports){
 !function(global, factory) {
-    'object' == typeof exports && 'undefined' != typeof module ? factory(exports) : 'function' == typeof define && define.amd ? define([ 'exports' ], factory) : factory(global.preact = global.preact || {});
+     true ? factory(exports) : 'function' == typeof define && define.amd ? define([ 'exports' ], factory) : factory(global.preact = global.preact || {});
 }(this, function(exports) {
     function VNode(nodeName, attributes, children) {
         this.nodeName = nodeName;
@@ -2356,5 +552,1942 @@ function isUndefined(arg) {
     exports.rerender = rerender;
     exports.options = options;
 });
+//# sourceMappingURL=preact.js.map
 
-},{}]},{},[1]);
+/***/ },
+/* 1 */
+/***/ function(module, exports) {
+
+// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+function EventEmitter() {
+  this._events = this._events || {};
+  this._maxListeners = this._maxListeners || undefined;
+}
+module.exports = EventEmitter;
+
+// Backwards-compat with node 0.10.x
+EventEmitter.EventEmitter = EventEmitter;
+
+EventEmitter.prototype._events = undefined;
+EventEmitter.prototype._maxListeners = undefined;
+
+// By default EventEmitters will print a warning if more than 10 listeners are
+// added to it. This is a useful default which helps finding memory leaks.
+EventEmitter.defaultMaxListeners = 10;
+
+// Obviously not all Emitters should be limited to 10. This function allows
+// that to be increased. Set to zero for unlimited.
+EventEmitter.prototype.setMaxListeners = function(n) {
+  if (!isNumber(n) || n < 0 || isNaN(n))
+    throw TypeError('n must be a positive number');
+  this._maxListeners = n;
+  return this;
+};
+
+EventEmitter.prototype.emit = function(type) {
+  var er, handler, len, args, i, listeners;
+
+  if (!this._events)
+    this._events = {};
+
+  // If there is no 'error' event listener then throw.
+  if (type === 'error') {
+    if (!this._events.error ||
+        (isObject(this._events.error) && !this._events.error.length)) {
+      er = arguments[1];
+      if (er instanceof Error) {
+        throw er; // Unhandled 'error' event
+      } else {
+        // At least give some kind of context to the user
+        var err = new Error('Uncaught, unspecified "error" event. (' + er + ')');
+        err.context = er;
+        throw err;
+      }
+    }
+  }
+
+  handler = this._events[type];
+
+  if (isUndefined(handler))
+    return false;
+
+  if (isFunction(handler)) {
+    switch (arguments.length) {
+      // fast cases
+      case 1:
+        handler.call(this);
+        break;
+      case 2:
+        handler.call(this, arguments[1]);
+        break;
+      case 3:
+        handler.call(this, arguments[1], arguments[2]);
+        break;
+      // slower
+      default:
+        args = Array.prototype.slice.call(arguments, 1);
+        handler.apply(this, args);
+    }
+  } else if (isObject(handler)) {
+    args = Array.prototype.slice.call(arguments, 1);
+    listeners = handler.slice();
+    len = listeners.length;
+    for (i = 0; i < len; i++)
+      listeners[i].apply(this, args);
+  }
+
+  return true;
+};
+
+EventEmitter.prototype.addListener = function(type, listener) {
+  var m;
+
+  if (!isFunction(listener))
+    throw TypeError('listener must be a function');
+
+  if (!this._events)
+    this._events = {};
+
+  // To avoid recursion in the case that type === "newListener"! Before
+  // adding it to the listeners, first emit "newListener".
+  if (this._events.newListener)
+    this.emit('newListener', type,
+              isFunction(listener.listener) ?
+              listener.listener : listener);
+
+  if (!this._events[type])
+    // Optimize the case of one listener. Don't need the extra array object.
+    this._events[type] = listener;
+  else if (isObject(this._events[type]))
+    // If we've already got an array, just append.
+    this._events[type].push(listener);
+  else
+    // Adding the second element, need to change to array.
+    this._events[type] = [this._events[type], listener];
+
+  // Check for listener leak
+  if (isObject(this._events[type]) && !this._events[type].warned) {
+    if (!isUndefined(this._maxListeners)) {
+      m = this._maxListeners;
+    } else {
+      m = EventEmitter.defaultMaxListeners;
+    }
+
+    if (m && m > 0 && this._events[type].length > m) {
+      this._events[type].warned = true;
+      console.error('(node) warning: possible EventEmitter memory ' +
+                    'leak detected. %d listeners added. ' +
+                    'Use emitter.setMaxListeners() to increase limit.',
+                    this._events[type].length);
+      if (typeof console.trace === 'function') {
+        // not supported in IE 10
+        console.trace();
+      }
+    }
+  }
+
+  return this;
+};
+
+EventEmitter.prototype.on = EventEmitter.prototype.addListener;
+
+EventEmitter.prototype.once = function(type, listener) {
+  if (!isFunction(listener))
+    throw TypeError('listener must be a function');
+
+  var fired = false;
+
+  function g() {
+    this.removeListener(type, g);
+
+    if (!fired) {
+      fired = true;
+      listener.apply(this, arguments);
+    }
+  }
+
+  g.listener = listener;
+  this.on(type, g);
+
+  return this;
+};
+
+// emits a 'removeListener' event iff the listener was removed
+EventEmitter.prototype.removeListener = function(type, listener) {
+  var list, position, length, i;
+
+  if (!isFunction(listener))
+    throw TypeError('listener must be a function');
+
+  if (!this._events || !this._events[type])
+    return this;
+
+  list = this._events[type];
+  length = list.length;
+  position = -1;
+
+  if (list === listener ||
+      (isFunction(list.listener) && list.listener === listener)) {
+    delete this._events[type];
+    if (this._events.removeListener)
+      this.emit('removeListener', type, listener);
+
+  } else if (isObject(list)) {
+    for (i = length; i-- > 0;) {
+      if (list[i] === listener ||
+          (list[i].listener && list[i].listener === listener)) {
+        position = i;
+        break;
+      }
+    }
+
+    if (position < 0)
+      return this;
+
+    if (list.length === 1) {
+      list.length = 0;
+      delete this._events[type];
+    } else {
+      list.splice(position, 1);
+    }
+
+    if (this._events.removeListener)
+      this.emit('removeListener', type, listener);
+  }
+
+  return this;
+};
+
+EventEmitter.prototype.removeAllListeners = function(type) {
+  var key, listeners;
+
+  if (!this._events)
+    return this;
+
+  // not listening for removeListener, no need to emit
+  if (!this._events.removeListener) {
+    if (arguments.length === 0)
+      this._events = {};
+    else if (this._events[type])
+      delete this._events[type];
+    return this;
+  }
+
+  // emit removeListener for all listeners on all events
+  if (arguments.length === 0) {
+    for (key in this._events) {
+      if (key === 'removeListener') continue;
+      this.removeAllListeners(key);
+    }
+    this.removeAllListeners('removeListener');
+    this._events = {};
+    return this;
+  }
+
+  listeners = this._events[type];
+
+  if (isFunction(listeners)) {
+    this.removeListener(type, listeners);
+  } else if (listeners) {
+    // LIFO order
+    while (listeners.length)
+      this.removeListener(type, listeners[listeners.length - 1]);
+  }
+  delete this._events[type];
+
+  return this;
+};
+
+EventEmitter.prototype.listeners = function(type) {
+  var ret;
+  if (!this._events || !this._events[type])
+    ret = [];
+  else if (isFunction(this._events[type]))
+    ret = [this._events[type]];
+  else
+    ret = this._events[type].slice();
+  return ret;
+};
+
+EventEmitter.prototype.listenerCount = function(type) {
+  if (this._events) {
+    var evlistener = this._events[type];
+
+    if (isFunction(evlistener))
+      return 1;
+    else if (evlistener)
+      return evlistener.length;
+  }
+  return 0;
+};
+
+EventEmitter.listenerCount = function(emitter, type) {
+  return emitter.listenerCount(type);
+};
+
+function isFunction(arg) {
+  return typeof arg === 'function';
+}
+
+function isNumber(arg) {
+  return typeof arg === 'number';
+}
+
+function isObject(arg) {
+  return typeof arg === 'object' && arg !== null;
+}
+
+function isUndefined(arg) {
+  return arg === void 0;
+}
+
+
+/***/ },
+/* 2 */
+/***/ function(module, exports, __webpack_require__) {
+
+"use strict";
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.ChartComponent = undefined;
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _preact = __webpack_require__(0);
+
+var _events = __webpack_require__(1);
+
+var _chartData = __webpack_require__(12);
+
+var _chartData2 = _interopRequireDefault(_chartData);
+
+var _xLabelContainer = __webpack_require__(8);
+
+var _xLabelContainer2 = _interopRequireDefault(_xLabelContainer);
+
+var _yLabelContainer = __webpack_require__(10);
+
+var _yLabelContainer2 = _interopRequireDefault(_yLabelContainer);
+
+var _box = __webpack_require__(4);
+
+var _box2 = _interopRequireDefault(_box);
+
+var _line = __webpack_require__(5);
+
+var _line2 = _interopRequireDefault(_line);
+
+var _rowItemContainer = __webpack_require__(6);
+
+var _rowItemContainer2 = _interopRequireDefault(_rowItemContainer);
+
+var _rowItem = __webpack_require__(7);
+
+var _rowItem2 = _interopRequireDefault(_rowItem);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var React = { Component: _preact.Component, cloneElement: _preact.cloneElement, createElement: _preact.h };
+
+var waitCount = 0;
+
+var PrettySimpleChart = function () {
+  function PrettySimpleChart(domID, conf) {
+    _classCallCheck(this, PrettySimpleChart);
+
+    this.conf = conf;
+    this.domID = domID;
+    this.hub = new _events.EventEmitter();
+  }
+
+  _createClass(PrettySimpleChart, [{
+    key: 'add',
+    value: function add(_ref) {
+      var data = _ref.data,
+          xLabel = _ref.xLabel;
+
+      this.hub.emit('send', { type: 'add', data: data, xLabel: xLabel });
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      (0, _preact.render)(React.createElement(ChartComponent, {
+        hub: this.hub,
+        conf: this.conf
+      }), document.querySelector('#' + this.domID));
+
+      return this;
+    }
+  }]);
+
+  return PrettySimpleChart;
+}();
+
+exports.default = PrettySimpleChart;
+
+var ChartComponent = exports.ChartComponent = function (_React$Component) {
+  _inherits(ChartComponent, _React$Component);
+
+  function ChartComponent() {
+    _classCallCheck(this, ChartComponent);
+
+    return _possibleConstructorReturn(this, (ChartComponent.__proto__ || Object.getPrototypeOf(ChartComponent)).apply(this, arguments));
+  }
+
+  _createClass(ChartComponent, [{
+    key: 'componentWillMount',
+    value: function componentWillMount() {
+      var _this2 = this;
+
+      var hub = this.props.hub;
+      var _props$conf = this.props.conf,
+          data = _props$conf.data,
+          size = _props$conf.size,
+          stack = _props$conf.stack,
+          xLabels = _props$conf.xLabels;
+
+
+      this.props.conf.innerHub = this.innerHub;
+
+      this.state = {
+        data: new _chartData2.default(data, size, stack),
+        xLabels: (xLabels || []).concat(),
+        wait: 0,
+        selectedID: -1
+      };
+
+      hub.on('send', function (e) {
+        return _this2.receive(e);
+      });
+      this.innerHub.on('toggleRow', function (_ref2) {
+        var id = _ref2.id,
+            selecting = _ref2.selecting;
+        return _this2.toggleRow(id, selecting);
+      });
+    }
+  }, {
+    key: 'receive',
+    value: function receive(e) {
+      switch (e.type) {
+        case 'add':
+          this.add(e.data, e.xLabel);
+          break;
+        default:
+        //
+      }
+    }
+  }, {
+    key: 'add',
+    value: function add(newData, xLabel) {
+      this.state.data.add(newData);
+
+      var newLabels = this.state.xLabels;
+      if (xLabel) {
+        newLabels = newLabels.concat();
+        newLabels.shift();
+        newLabels.push(xLabel);
+      }
+
+      this.setState({
+        data: this.state.data,
+        xLabels: newLabels,
+        wait: waitCount
+      });
+    }
+  }, {
+    key: 'toggleRow',
+    value: function toggleRow(selectedID) {
+      var isSelecting = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+
+      isSelecting ? this.setState({ selectedID: selectedID }) : this.setState({ selectedID: -1 });
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      var _this3 = this;
+
+      var conf = this.props.conf;
+      var width = conf.w,
+          height = conf.h,
+          yLabelWidth = conf.yLabelWidth,
+          xLabelHeight = conf.xLabelHeight;
+
+
+      return React.createElement(
+        'div',
+        {
+          className: 'ps-chart ps-container',
+          onClick: function onClick() {
+            return _this3.setState({ selectedID: -1 });
+          },
+          style: { width: width + yLabelWidth, height: height + xLabelHeight }
+        },
+        React.createElement(_yLabelContainer2.default, this.props),
+        React.createElement(_xLabelContainer2.default, _extends({
+          labels: this.state.xLabels
+        }, this.props)),
+        React.createElement(
+          _box2.default,
+          this.props,
+          this.lines
+        ),
+        React.createElement(
+          _rowItemContainer2.default,
+          this.props,
+          this.rowItems
+        )
+      );
+    }
+  }, {
+    key: 'innerHub',
+    get: function get() {
+      return this.pInnerHub || (this.pInnerHub = new _events.EventEmitter());
+    }
+  }, {
+    key: 'lines',
+    get: function get() {
+      var _this4 = this;
+
+      var conf = this.props.conf;
+      var selectedID = this.state.selectedID;
+
+      var strong = this.state.selectedID !== -1;
+
+      var ls = [];
+      var selectedLine = [];
+
+      Object.keys(this.state.data.data).forEach(function (i) {
+        var row = _this4.state.data.data[i];
+        var color = strong && selectedID !== row.id ? '#bdc3c7' : row.color;
+
+        var lineConfiguration = {
+          data: row,
+          color: color,
+          conf: conf
+        };
+
+        if (conf.stack) {
+          lineConfiguration.line = row.stack;
+          lineConfiguration.thickness = 0;
+
+          ls.push(React.createElement(_line2.default, lineConfiguration));
+        } else {
+          lineConfiguration.line = row.data;
+
+          if (strong && selectedID === row.id) {
+            lineConfiguration.thickness = 4;
+            selectedLine = React.createElement(_line2.default, lineConfiguration);
+          } else {
+            lineConfiguration.thickness = 2;
+            ls.push(React.createElement(_line2.default, lineConfiguration));
+          }
+        }
+      });
+
+      selectedLine && ls.unshift(selectedLine);
+
+      return ls.reverse();
+    }
+  }, {
+    key: 'rowItems',
+    get: function get() {
+      var _this5 = this;
+
+      var conf = this.props.conf;
+      var selectedID = this.state.selectedID;
+      var yLabelFormat = conf.yLabelFormat;
+
+      var items = [];
+
+      Object.keys(this.state.data.data).forEach(function (i) {
+        var data = _this5.state.data.data[i];
+        var value = data.data[data.data.length - 1];
+        yLabelFormat && (value = yLabelFormat(value));
+
+        items.push(React.createElement(_rowItem2.default, {
+          selected: data.id === selectedID,
+          value: value,
+          data: data,
+          conf: conf
+        }));
+      });
+
+      return items.reverse();
+    }
+  }]);
+
+  return ChartComponent;
+}(React.Component);
+
+/***/ },
+/* 3 */
+/***/ function(module, exports, __webpack_require__) {
+
+"use strict";
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _preact = __webpack_require__(0);
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var React = { Component: _preact.Component, cloneElement: _preact.cloneElement, createElement: _preact.h };
+
+var BoxBG = function (_React$Component) {
+  _inherits(BoxBG, _React$Component);
+
+  function BoxBG() {
+    _classCallCheck(this, BoxBG);
+
+    return _possibleConstructorReturn(this, (BoxBG.__proto__ || Object.getPrototypeOf(BoxBG)).apply(this, arguments));
+  }
+
+  _createClass(BoxBG, [{
+    key: 'shouldComponentUpdate',
+    value: function shouldComponentUpdate() {
+      return false;
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      return React.createElement(
+        'g',
+        null,
+        this.horizontalLines,
+        this.verticalLines
+      );
+    }
+  }, {
+    key: 'horizontalLines',
+    get: function get() {
+      var conf = this.props.conf;
+      var width = conf.w,
+          height = conf.h,
+          yMax = conf.yMax,
+          yLabelStep = conf.yLabelStep;
+
+
+      var l = Math.round(yMax / yLabelStep);
+      var yStep = height / (yMax / yLabelStep);
+
+      var ls = [];
+
+      for (var i = 0; i <= l; i++) {
+        var y = yStep * i;
+
+        ls.push(React.createElement('line', {
+          x1: 0,
+          x2: width,
+          y1: y,
+          y2: y,
+          style: { stroke: '#ecf0f1', strokeWidth: 1 }
+        }));
+      }
+
+      return ls;
+    }
+  }, {
+    key: 'verticalLines',
+    get: function get() {
+      var _props$conf = this.props.conf,
+          width = _props$conf.w,
+          height = _props$conf.h,
+          xSize = _props$conf.xSize;
+
+
+      var xStep = width / (xSize - 1);
+
+      var ls = [];
+
+      for (var i = 0; i < xSize; i++) {
+        var x = xStep * i;
+
+        ls.push(React.createElement('line', {
+          x1: x,
+          x2: x,
+          y1: 0,
+          y2: height,
+          style: { stroke: '#ecf0f1', strokeWidth: 1, strokeDasharray: '2, 4' }
+        }));
+      }
+
+      return ls;
+    }
+  }]);
+
+  return BoxBG;
+}(React.Component);
+
+exports.default = BoxBG;
+
+/***/ },
+/* 4 */
+/***/ function(module, exports, __webpack_require__) {
+
+"use strict";
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = Box;
+
+var _preact = __webpack_require__(0);
+
+var _boxBg = __webpack_require__(3);
+
+var _boxBg2 = _interopRequireDefault(_boxBg);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var React = { Component: _preact.Component, cloneElement: _preact.cloneElement, createElement: _preact.h };
+
+function Box(props) {
+  var children = props.children;
+  var _props$conf = props.conf,
+      width = _props$conf.w,
+      height = _props$conf.h,
+      yLabelWidth = _props$conf.yLabelWidth;
+
+
+  var viewBox = '0 0 ' + width + ' ' + height;
+
+  var style = {
+    top: 0,
+    left: yLabelWidth,
+    width: width,
+    height: height
+  };
+
+  return React.createElement(
+    'svg',
+    {
+      className: 'ps-chart ps-line-box',
+      style: style,
+      viewBox: viewBox
+    },
+    React.createElement(_boxBg2.default, props),
+    children
+  );
+}
+
+/***/ },
+/* 5 */
+/***/ function(module, exports, __webpack_require__) {
+
+"use strict";
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _preact = __webpack_require__(0);
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var React = { Component: _preact.Component, cloneElement: _preact.cloneElement, createElement: _preact.h };
+
+var Line = function () {
+  function Line() {
+    _classCallCheck(this, Line);
+  }
+
+  _createClass(Line, [{
+    key: 'computeX',
+    value: function computeX(position, length) {
+      var w = this.props.conf.w;
+
+
+      return (w + 1) / (length - 1) * position;
+    }
+  }, {
+    key: 'computeY',
+    value: function computeY(value) {
+      var _props$conf = this.props.conf,
+          height = _props$conf.h,
+          yMax = _props$conf.yMax;
+
+
+      return height - height * (value / yMax);
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      var _this = this;
+
+      var stack = this.props.conf.stack;
+      var _props = this.props,
+          color = _props.color,
+          thickness = _props.thickness;
+      var _props$data = this.props.data,
+          id = _props$data.id,
+          name = _props$data.name;
+
+
+      return React.createElement(
+        'g',
+        { id: name + id, key: name },
+        React.createElement('path', {
+          onMouseOver: function onMouseOver() {
+            return _this.hub.emit('toggleRow', { id: id, selecting: true });
+          },
+          fill: stack ? color : 'none',
+          d: this.lineValue,
+          style: { stroke: color, strokeWidth: thickness }
+        })
+      );
+    }
+  }, {
+    key: 'hub',
+    get: function get() {
+      return this.props.conf.innerHub;
+    }
+  }, {
+    key: 'lineValue',
+    get: function get() {
+      var _props$conf2 = this.props.conf,
+          stack = _props$conf2.stack,
+          width = _props$conf2.w,
+          height = _props$conf2.h;
+      var line = this.props.line;
+
+
+      var start = -1;
+      var end = width + 1;
+
+      var d = 'M ' + start + ' ' + this.computeY(line[0]) + ' ';
+      var l = line.length;
+
+      for (var i = 1; i < l; i++) {
+        d += 'L ' + this.computeX(i, l) + ' ' + this.computeY(line[i]);
+      }
+
+      if (stack) {
+        d += 'L ' + end + ' ' + height + ' L ' + start + ' ' + _preact.h;
+      }
+
+      return d;
+    }
+  }]);
+
+  return Line;
+}();
+
+exports.default = Line;
+
+/***/ },
+/* 6 */
+/***/ function(module, exports, __webpack_require__) {
+
+"use strict";
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _preact = __webpack_require__(0);
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var React = { Component: _preact.Component, cloneElement: _preact.cloneElement, createElement: _preact.h };
+
+var RowItemContainer = function () {
+  function RowItemContainer() {
+    _classCallCheck(this, RowItemContainer);
+  }
+
+  _createClass(RowItemContainer, [{
+    key: "render",
+    value: function render() {
+      var _props$conf = this.props.conf,
+          width = _props$conf.w,
+          height = _props$conf.h,
+          xLabelHeight = _props$conf.xLabelHeight,
+          rowItemWidth = _props$conf.rowItemWidth;
+
+
+      return React.createElement(
+        "div",
+        {
+          className: "ps-chart ps-row-item-container",
+          style: {
+            top: 0,
+            left: width + xLabelHeight,
+            width: rowItemWidth,
+            height: height + xLabelHeight
+          }
+        },
+        this.props.children
+      );
+    }
+  }]);
+
+  return RowItemContainer;
+}();
+
+exports.default = RowItemContainer;
+
+/***/ },
+/* 7 */
+/***/ function(module, exports, __webpack_require__) {
+
+"use strict";
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _preact = __webpack_require__(0);
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var React = { Component: _preact.Component, cloneElement: _preact.cloneElement, createElement: _preact.h };
+
+var RowItem = function () {
+  function RowItem() {
+    _classCallCheck(this, RowItem);
+  }
+
+  _createClass(RowItem, [{
+    key: 'render',
+    value: function render() {
+      var _this = this;
+
+      var _props$data = this.props.data,
+          name = _props$data.name,
+          color = _props$data.color,
+          id = _props$data.id;
+      var _props = this.props,
+          value = _props.value,
+          selected = _props.selected;
+
+
+      var additionalClassName = selected ? 'ps-row-item-selected' : '';
+
+      return React.createElement(
+        'div',
+        {
+          className: 'ps-chart ps-row-item ' + additionalClassName,
+          onMouseOver: function onMouseOver() {
+            return _this.hub.emit('toggleRow', { id: id, selecting: true });
+          }
+        },
+        React.createElement(
+          'div',
+          { className: 'ps-chart ps-row-item-color', style: { color: color } },
+          '\u25A0'
+        ),
+        React.createElement(
+          'div',
+          { className: 'ps-chart ps-row-item-name' },
+          name
+        ),
+        React.createElement(
+          'div',
+          { className: 'ps-chart ps-row-item-value' },
+          value
+        )
+      );
+    }
+  }, {
+    key: 'hub',
+    get: function get() {
+      return this.props.conf.innerHub;
+    }
+  }]);
+
+  return RowItem;
+}();
+
+exports.default = RowItem;
+
+/***/ },
+/* 8 */
+/***/ function(module, exports, __webpack_require__) {
+
+"use strict";
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _preact = __webpack_require__(0);
+
+var _xLabel = __webpack_require__(9);
+
+var _xLabel2 = _interopRequireDefault(_xLabel);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var React = { Component: _preact.Component, cloneElement: _preact.cloneElement, createElement: _preact.h };
+
+var XLabelContainer = function (_React$Component) {
+  _inherits(XLabelContainer, _React$Component);
+
+  function XLabelContainer() {
+    _classCallCheck(this, XLabelContainer);
+
+    return _possibleConstructorReturn(this, (XLabelContainer.__proto__ || Object.getPrototypeOf(XLabelContainer)).apply(this, arguments));
+  }
+
+  _createClass(XLabelContainer, [{
+    key: 'render',
+    value: function render() {
+      var conf = this.props.conf;
+      var width = conf.w,
+          height = conf.h,
+          yLabelWidth = conf.yLabelWidth,
+          xLabelHeight = conf.xLabelHeight;
+
+
+      return React.createElement(
+        'div',
+        {
+          className: 'ps-chart ps-x-label-container',
+          style: {
+            conf: conf,
+            top: height,
+            left: yLabelWidth,
+            width: width,
+            height: xLabelHeight
+          }
+        },
+        this.labels
+      );
+    }
+  }, {
+    key: 'labels',
+    get: function get() {
+      var conf = this.props.conf;
+      var w = conf.w,
+          xSize = conf.xSize,
+          xLabelFormat = conf.xLabelFormat;
+
+
+      var xStep = w / (xSize - 1);
+      var ls = [];
+
+      for (var i = 0; i < xSize; i++) {
+        var xl = this.props.labels[i] || 0;
+        ls.push(React.createElement(_xLabel2.default, {
+          conf: conf,
+          label: xLabelFormat ? xLabelFormat(xl) : xl,
+          left: xStep * i,
+          top: 0
+        }));
+      }
+
+      return ls;
+    }
+  }]);
+
+  return XLabelContainer;
+}(React.Component);
+
+exports.default = XLabelContainer;
+
+/***/ },
+/* 9 */
+/***/ function(module, exports, __webpack_require__) {
+
+"use strict";
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _preact = __webpack_require__(0);
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var React = { Component: _preact.Component, cloneElement: _preact.cloneElement, createElement: _preact.h };
+
+var XLabel = function (_React$Component) {
+  _inherits(XLabel, _React$Component);
+
+  function XLabel() {
+    _classCallCheck(this, XLabel);
+
+    return _possibleConstructorReturn(this, (XLabel.__proto__ || Object.getPrototypeOf(XLabel)).apply(this, arguments));
+  }
+
+  _createClass(XLabel, [{
+    key: "componentDidMount",
+    value: function componentDidMount() {
+      this.reset();
+    }
+  }, {
+    key: "reset",
+    value: function reset() {
+      var _this2 = this;
+
+      if (this.props.centering) {
+        setTimeout(function () {
+          _this2.setState({ offset: -_this2.innerLabel.clientWidth / 2 });
+        }, 0);
+      }
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      var _this3 = this;
+
+      var _props = this.props,
+          left = _props.left,
+          label = _props.label;
+
+
+      var labelRotation = this.props.conf.xLabelRotate || 0;
+
+      return React.createElement(
+        "div",
+        {
+          className: "ps-chart ps-x-label",
+          style: {
+            left: left,
+            transform: "rotateZ(" + labelRotation + "deg)"
+          }
+        },
+        React.createElement(
+          "div",
+          {
+            className: "ps-chart ps-x-label-inner",
+            ref: function ref(l) {
+              return _this3.innerLabel = l;
+            },
+            style: { left: this.state.offset }
+          },
+          label
+        )
+      );
+    }
+  }]);
+
+  return XLabel;
+}(React.Component);
+
+exports.default = XLabel;
+
+/***/ },
+/* 10 */
+/***/ function(module, exports, __webpack_require__) {
+
+"use strict";
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _preact = __webpack_require__(0);
+
+var _yLabel = __webpack_require__(11);
+
+var _yLabel2 = _interopRequireDefault(_yLabel);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var React = { Component: _preact.Component, cloneElement: _preact.cloneElement, createElement: _preact.h };
+
+var YLabelContainer = function () {
+  function YLabelContainer() {
+    _classCallCheck(this, YLabelContainer);
+  }
+
+  _createClass(YLabelContainer, [{
+    key: 'render',
+    value: function render() {
+      return React.createElement(
+        'div',
+        {
+          className: 'ps-chart ps-y-label-container',
+          style: {
+            top: 0,
+            left: 0
+          }
+        },
+        this.labels
+      );
+    }
+  }, {
+    key: 'labels',
+    get: function get() {
+      var conf = this.props.conf;
+      var height = conf.h,
+          yMax = conf.yMax,
+          yLabelStep = conf.yLabelStep;
+
+
+      var l = Math.round(yMax / yLabelStep);
+      var yStep = _preact.h / (yMax / yLabelStep);
+      var ls = [];
+
+      for (var i = 0; i <= l; i++) {
+        ls.push(React.createElement(_yLabel2.default, {
+          conf: conf,
+          label: i * yLabelStep,
+          top: height - yStep * i
+        }));
+      }
+
+      return ls;
+    }
+  }]);
+
+  return YLabelContainer;
+}();
+
+exports.default = YLabelContainer;
+
+/***/ },
+/* 11 */
+/***/ function(module, exports, __webpack_require__) {
+
+"use strict";
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = YLabel;
+
+var _preact = __webpack_require__(0);
+
+var React = { Component: _preact.Component, cloneElement: _preact.cloneElement, createElement: _preact.h };
+
+function YLabel(props) {
+  var top = props.top,
+      raw = props.label;
+  var _props$conf = props.conf,
+      yLabelWidth = _props$conf.yLabelWidth,
+      yLabelFormat = _props$conf.yLabelFormat;
+
+
+  var label = yLabelFormat ? yLabelFormat(raw) : raw;
+
+  return React.createElement(
+    "div",
+    {
+      className: "ps-chart ps-y-label",
+      style: {
+        top: top,
+        width: yLabelWidth
+      }
+    },
+    label
+  );
+}
+
+/***/ },
+/* 12 */
+/***/ function(module, exports, __webpack_require__) {
+
+"use strict";
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _chatRow = __webpack_require__(13);
+
+var _chatRow2 = _interopRequireDefault(_chatRow);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var ChartData = function () {
+  function ChartData(raw, size) {
+    var _this = this;
+
+    var isStack = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+
+    _classCallCheck(this, ChartData);
+
+    this.data = {};
+    this.size = size;
+    this.total = 0;
+    this.stack = [];
+    this.isStack = isStack;
+
+    Object.keys(raw).forEach(function (k) {
+      var row = new _chatRow2.default(raw[k]);
+      if (row.total !== 0) {
+        _this.data[k] = row;
+      }
+    });
+
+    if (!this.isStack) {
+      return;
+    }
+
+    Object.keys(this.data).forEach(function (k) {
+      _this.data[k].prepareStack();
+    });
+
+    var _loop = function _loop(i) {
+      var pre = 0;
+      Object.keys(_this.data).forEach(function (k) {
+        var now = _this.data[k];
+        now.setInStack(i, pre + now.data[i]);
+        pre = now.stack[i];
+      });
+    };
+
+    for (var i = size; i--;) {
+      _loop(i);
+    }
+  }
+
+  _createClass(ChartData, [{
+    key: 'removeRow',
+    value: function removeRow(row) {
+      delete this.data[row.id];
+    }
+  }, {
+    key: 'add',
+    value: function add(newData) {
+      var _this2 = this;
+
+      var pre = 0;
+
+      // 既存の row に反映
+      Object.keys(this.data).forEach(function (k) {
+        var row = _this2.data[k];
+
+        var next = void 0;
+        if (newData[row.id]) {
+          next = newData[row.id].value;
+          delete newData[row.id]; // eslint-disable-line no-param-reassign
+        } else {
+          next = 0;
+        }
+        pre += next;
+        row.shiftAndPush(next, pre);
+
+        row.removable && _this2.removeRow(row);
+      });
+
+      // 新しい row を追加
+      Object.keys(newData).forEach(function (k) {
+        var _newData$k = newData[k],
+            id = _newData$k.id,
+            name = _newData$k.name,
+            value = _newData$k.value;
+
+
+        var data = [];
+
+        for (var ii = _this2.size - 1; ii--;) {
+          data[ii] = 0;
+        }
+
+        data.push(value);
+
+        var row = new _chatRow2.default({ id: id, name: name, data: data });
+
+        if (row.total === 0) {
+          return;
+        }
+
+        if (_this2.isStack) {
+          var previousLine = void 0;
+          for (var _ii = id; _ii--;) {
+            if (_this2.data[_ii]) {
+              previousLine = _this2.data[_ii];
+              break;
+            }
+          }
+
+          row.copyStackFrom(previousLine);
+          row.stack[data.length - 1] += value;
+        }
+
+        _this2.data[id] = row;
+      });
+    }
+  }]);
+
+  return ChartData;
+}();
+
+exports.default = ChartData;
+
+/***/ },
+/* 13 */
+/***/ function(module, exports, __webpack_require__) {
+
+"use strict";
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _colorWheel = __webpack_require__(14);
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var ChartRow = function () {
+  function ChartRow(_ref) {
+    var id = _ref.id,
+        _ref$name = _ref.name,
+        name = _ref$name === undefined ? '' : _ref$name,
+        _ref$data = _ref.data,
+        data = _ref$data === undefined ? [] : _ref$data,
+        color = _ref.color;
+
+    _classCallCheck(this, ChartRow);
+
+    this.id = id;
+    this.name = name;
+    this.data = data;
+    this.stack = [];
+    this.total = this.data.reduce(function (a, n) {
+      return a + Math.floor(n * 10);
+    }, 0);
+
+    this.color = color || (0, _colorWheel.numToColor)(this.id);
+  }
+
+  _createClass(ChartRow, [{
+    key: 'copyStackFrom',
+    value: function copyStackFrom(previousLine) {
+      this.stack = (previousLine ? previousLine.stack : this.data).map(function (d) {
+        return d;
+      });
+    }
+  }, {
+    key: 'shiftAndPush',
+    value: function shiftAndPush(value, stackValue) {
+      var remove = this.data.shift();
+      this.total += Math.floor(value * 10) - Math.floor(remove * 10);
+      this.data.push(value);
+
+      this.stack.shift();
+      this.stack.push(stackValue);
+    }
+  }, {
+    key: 'prepareStack',
+    value: function prepareStack() {
+      this.stack = this.data.concat();
+    }
+  }, {
+    key: 'setInStack',
+    value: function setInStack(i, v) {
+      this.stack[i] = v;
+    }
+  }, {
+    key: 'removable',
+    get: function get() {
+      return this.total <= 0;
+    }
+  }]);
+
+  return ChartRow;
+}();
+
+exports.default = ChartRow;
+
+/***/ },
+/* 14 */
+/***/ function(module, exports) {
+
+"use strict";
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.textToColor = textToColor;
+exports.numToColor = numToColor;
+var colors = exports.colors = ['#0086AB', '#0098A6', '#00A199', '#009C7F', '#009767', '#009250', '#059C30', '#0BA60B', '#3BB111', '#6FBB18', '#A4C520', '#B6D11B', '#CBDC15', '#E4E80F', '#F3EB08', '#FFE600', '#FBDA02', '#F8CF05', '#F4C107', '#F1B709', '#EDAD0B', '#E58611', '#DE6316', '#D6431B', '#CF2620', '#C7243A', '#C42245', '#C01F52', '#BD1D5D', '#B91B67', '#B61972', '#AF1C74', '#A81F76', '#A12275', '#9A2475', '#932674', '#953095', '#7F3B97', '#6C469A', '#5F519C', '#5D639E', '#4D5FA3', '#3B60A8', '#2962AD', '#156BB2', '#007AB7', '#007CB5', '#0080B2', '#0081B0', '#0085AD'];
+
+var colorLength = colors.length;
+
+function textToColor(s) {
+  return colors[(s.charCodeAt(1) + s.charCodeAt(2)) % colorLength];
+}
+
+function numToColor(n) {
+  return colors[n * 8 % colorLength];
+}
+
+/***/ },
+/* 15 */
+/***/ function(module, exports, __webpack_require__) {
+
+"use strict";
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Configure = undefined;
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _preact = __webpack_require__(0);
+
+var _prettySimpleChart = __webpack_require__(2);
+
+var _prettySimpleChart2 = _interopRequireDefault(_prettySimpleChart);
+
+var _events = __webpack_require__(1);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var c3 = window.c3;
+var req = window.superagent;
+
+var React = { Component: _preact.Component, cloneElement: _preact.cloneElement, createElement: _preact.h };
+
+var Configure = exports.Configure = function () {
+  function Configure() {
+    _classCallCheck(this, Configure);
+  }
+
+  _createClass(Configure, null, [{
+    key: 'size',
+    set: function set(v) {
+      this._dataArray = [];
+      for (var i = v; i--;) {
+        this._dataArray.push(0);
+      }
+      this._size = v;
+    },
+    get: function get() {
+      return this._size;
+    }
+  }, {
+    key: 'dataArray',
+    get: function get() {
+      return this._dataArray.concat();
+    }
+  }]);
+
+  return Configure;
+}();
+
+var Watcher = function () {
+  function Watcher(_ref) {
+    var size = _ref.size,
+        wait = _ref.wait,
+        tasks = _ref.tasks,
+        totalCPU = _ref.totalCPU,
+        totalMemory = _ref.totalMemory,
+        CPUGraph = _ref.CPUGraph,
+        memoryGraph = _ref.memoryGraph,
+        initialData = _ref.initialData,
+        names = _ref.names,
+        realNames = _ref.realNames,
+        min = _ref.min;
+
+    _classCallCheck(this, Watcher);
+
+    this.conf = {
+      tasks: tasks,
+      totalCPU: totalCPU,
+      totalMemory: totalMemory,
+      CPUGraph: CPUGraph,
+      memoryGraph: memoryGraph,
+      initialData: initialData,
+      names: names,
+      realNames: realNames,
+      min: min
+    };
+
+    Configure.wait = wait;
+    Configure.size = size;
+    Configure.min = min;
+    Configure.keyMap = {};
+    realNames.forEach(function (n, i) {
+      Configure.keyMap[n] = i;
+    });
+
+    this.store = new DataStore();
+  }
+
+  _createClass(Watcher, [{
+    key: 'start',
+    value: function start() {
+      this.initialize();
+    }
+  }, {
+    key: 'initialize',
+    value: function initialize() {
+      var _this = this;
+
+      var keyMap = Configure.keyMap;
+
+
+      this.timeList = [];
+      var processList = {};
+      var memoryList = {
+        // 1: { id: 1, color: '#bdc3c7', name: 'free', data: [] },
+        2: { id: 2, name: 'used', data: [] },
+        3: { id: 3, name: 'buffers', data: [] }
+      };
+
+      var CPUList = {
+        1: { id: 1, name: 'User', data: [] },
+        2: { id: 2, name: 'System', data: [] },
+        3: { id: 3, name: 'Nice', data: [] },
+        // 4: { id: 4, color: '#bdc3c7', name: 'Idle', data: [] },
+        5: { id: 5, name: 'IOWait', data: [] },
+        6: { id: 6, name: 'HardwareInterrupt', data: [] },
+        7: { id: 7, name: 'SoftwareInterrupt', data: [] },
+        8: { id: 8, name: 'StolenTime', data: [] }
+      };
+
+      this.conf.initialData.forEach(function (_ref2, i) {
+        var memory = _ref2.memory,
+            cpu = _ref2.cpu,
+            time = _ref2.time,
+            processes = _ref2.processes,
+            rowPositions = _ref2.rowPositions;
+
+        // manage time
+        _this.timeList.push(time * 1000 + '');
+
+        var Total = memory.Total,
+            Used = memory.Used,
+            Free = memory.Free,
+            Buffers = memory.Buffers;
+
+
+        _this.totalMemory = +Total;
+        // memoryList[1].data.push(Math.round(+Free / this.totalMemory * 1000) / 10)
+        memoryList[2].data.push(Math.round(+Used / _this.totalMemory * 1000) / 10);
+        memoryList[3].data.push(Math.round(+Buffers / _this.totalMemory * 1000) / 10);
+
+        var User = cpu.User,
+            System = cpu.System,
+            Nice = cpu.Nice,
+            Idle = cpu.Idle,
+            IOWait = cpu.IOWait,
+            HardwareInterrupt = cpu.HardwareInterrupt,
+            SoftwareInterrupt = cpu.SoftwareInterrupt,
+            StolenTime = cpu.StolenTime;
+
+
+        CPUList[1].data.push(User);
+        CPUList[2].data.push(System);
+        CPUList[3].data.push(Nice);
+        // CPUList[4].data.push(Idle)
+        CPUList[5].data.push(IOWait);
+        CPUList[6].data.push(HardwareInterrupt);
+        CPUList[7].data.push(SoftwareInterrupt);
+        CPUList[8].data.push(StolenTime);
+
+        if (!processes) {
+          return {};
+        }
+
+        // manage processes
+        processes.forEach(function (process) {
+          var pid = process[rowPositions.PID];
+          var cmd = process[rowPositions.COMMAND];
+          if (cmd.indexOf('/top') != -1 || cmd === 'top') {
+            return;
+          }
+
+          var pidQueue = processList[pid] ? processList[pid] : processList[pid] = {
+            pid: pid,
+            cmd: cmd,
+            rowPositions: rowPositions,
+            data: Configure.dataArray
+          };
+
+          pidQueue.data[i] = { process: process };
+        });
+      });
+
+      var gen = function gen(o) {
+        return Object.assign({}, {
+          size: Configure.size,
+          xLabels: _this.timeList,
+          stack: true,
+          w: 600,
+          h: 300,
+          xLabelHeight: 70,
+          xSize: Configure.size,
+          xLabelRotate: 90,
+          yLabelWidth: 50,
+          yMax: 100,
+          yLabelStep: 20,
+          rowItemWidth: 200,
+          yLabelFormat: function yLabelFormat(v) {
+            return v + ' %';
+          },
+          xLabelFormat: function xLabelFormat(v) {
+            return dateString(v);
+          }
+        }, o);
+      };
+
+      var totalCPU = new _prettySimpleChart2.default('totalCPU', gen({
+        name: 'totalCPU',
+        data: CPUList
+      })).render();
+
+      var totalMemory = new _prettySimpleChart2.default('totalMemory', gen({
+        name: 'totalMemory',
+        data: memoryList
+      })).render();
+
+      var CPUGraph = new _prettySimpleChart2.default('CPUGraph', gen({
+        name: 'PerCPU',
+        data: pickRow('%CPU', processList),
+        stack: false
+      })).render();
+
+      var memoryGraph = new _prettySimpleChart2.default('memoryGraph', gen({
+        name: 'PerMemory',
+        data: pickRow('%MEM', processList)
+      })).render();
+
+      setInterval(function () {
+        req.get('/r').set('Accept', 'application/json').end(function (err, res) {
+          var _res$body = res.body,
+              processes = _res$body.processes,
+              rowPositions = _res$body.rowPositions,
+              time = _res$body.time,
+              cpu = _res$body.cpu,
+              memory = _res$body.memory;
+
+          time *= 1000;
+          var picked = pick(processes, rowPositions.PID, rowPositions.COMMAND, [rowPositions['%CPU'], rowPositions['%MEM']]);
+
+          CPUGraph.add({
+            data: picked[rowPositions['%CPU']],
+            xLabel: time
+          });
+
+          memoryGraph.add({
+            type: 'add', data: picked[rowPositions['%MEM']],
+            xLabel: time
+          });
+
+          var memoryList = {
+            // 1: { id: 1, color: '#bdc3c7', name: 'free', value: Math.round(memory.Free / this.totalMemory * 1000) / 10 },
+            2: {
+              id: 2,
+              color: '#e74c3c',
+              name: 'used',
+              value: Math.round(memory.Used / _this.totalMemory * 1000) / 10
+            },
+            3: {
+              id: 3,
+              color: '#9b59b6',
+              name: 'buffers',
+              value: Math.round(memory.Buffers / _this.totalMemory * 1000) / 10
+            }
+          };
+
+          totalMemory.add({
+            data: memoryList,
+            xLabel: time
+          });
+
+          var CPUList = {
+            1: { id: 1, name: 'User', value: cpu.User },
+            2: { id: 2, name: 'System', value: cpu.System },
+            3: { id: 3, name: 'Nice', value: cpu.Nice },
+            // 4: { id: 4, name: 'Idle', value: cpu.Idle },
+            5: { id: 5, name: 'IOWait', value: cpu.IOWait },
+            6: {
+              id: 6,
+              name: 'HardwareInterrupt',
+              value: cpu.HardwareInterrupt
+            },
+            7: {
+              id: 7,
+              name: 'SoftwareInterrupt',
+              value: cpu.SoftwareInterrupt
+            },
+            8: { id: 8, name: 'StolenTime', value: cpu.StolenTime }
+          };
+
+          totalCPU.add({
+            data: CPUList,
+            xLabel: time
+          });
+        });
+      }, Configure.wait * 1000);
+    }
+  }]);
+
+  return Watcher;
+}();
+
+function pickRow(rowName, processList) {
+  var re = {};
+
+  var _loop = function _loop(i) {
+    var now = processList[i];
+    if (now.cmd.indexOf('top') !== -1) {
+      return 'continue';
+    }
+    var pos = now.rowPositions[rowName];
+    re[i] = {
+      id: +now.pid,
+      name: now.cmd,
+      data: now.data.map(function (d) {
+        return d.process ? +d.process[pos] : 0;
+      })
+    };
+  };
+
+  for (var i in processList) {
+    var _ret = _loop(i);
+
+    if (_ret === 'continue') continue;
+  }
+  return re;
+}
+
+function dateString(unixTime) {
+  var d = new Date(+unixTime);
+  return double(d.getHours()) + ':' + double(d.getMinutes()) + ':' + double(d.getSeconds());
+}
+
+function double(n) {
+  return (n < 10 ? '0' : '') + n;
+}
+
+function pick(processes, idPosition, namePosition, valuePositions) {
+  var re = {};
+  processes.forEach(function (process) {
+    valuePositions.forEach(function (valuePosition) {
+      if (!re[valuePosition]) {
+        re[valuePosition] = {};
+      }
+      var id = process[idPosition];
+      if (process[namePosition].indexOf('top') !== -1) {
+        return;
+      }
+      re[valuePosition][id] = {
+        id: +process[idPosition],
+        name: process[namePosition],
+        value: +process[valuePosition]
+      };
+    });
+  });
+  return re;
+}
+
+var DataStore = function () {
+  function DataStore() {
+    _classCallCheck(this, DataStore);
+
+    this.store = {};
+  }
+
+  _createClass(DataStore, [{
+    key: 'column',
+    value: function column(name) {
+      var re = {};
+      for (var i in this.store) {
+        re.push({
+          id: +this.store[i].pid,
+          name: this.store[i].cmd,
+          data: this.store[i].getByName(name)
+        });
+      }
+      return re;
+    }
+  }, {
+    key: 'process',
+    value: function process(pid, cmd) {
+      if (this.store[pid]) {
+        return this.store[pid];
+      }
+
+      return this.store[pid] = new DataSet({ pid: pid, cmd: cmd });
+    }
+  }]);
+
+  return DataStore;
+}();
+
+window.Watcher = Watcher;
+
+/***/ }
+/******/ ]);
