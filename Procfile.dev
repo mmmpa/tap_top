@@ -1,0 +1,4 @@
+watch: spy go run ./cmd/tap_top/main.go
+js: cd lib && yarn run dev-js
+css: cd lib && yarn run dev-css
+lint: cd lib && yarn run lint

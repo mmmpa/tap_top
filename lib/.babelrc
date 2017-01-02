@@ -1,13 +1,30 @@
 {
-  "presets": ["react", "es2015"],
+  "presets": [
+    "react",
+    "es2015"
+  ],
   "plugins": [
-    ["transform-react-jsx"],
-    ["module-resolver", {
-      "root": ["."],
-      "alias": {
-        "react": "preact",
-        "react-dom": "preact"
+    [
+      "transform-react-jsx"
+    ],
+    [
+      "module-resolver",
+      {
+        "root": [
+          "."
+        ],
+        "alias": {
+          "react": "preact",
+          "react-dom": "preact"
+        }
       }
-    }]
-  ]
+    ]
+  ],
+  "env": {
+    "test": {
+      "presets": [
+        "power-assert"
+      ]
+    }
+  }
 }

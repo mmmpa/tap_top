@@ -29,7 +29,7 @@
 
   <script>
     new Watcher({
-      size: '{{.Size}}',
+      dataLength: '{{.Size}}',
       wait: '{{.Wait}}',
       tasks: 'tasks',
       totalCPU: 'totalCPU',
@@ -40,7 +40,7 @@
       names: JSON.parse('{{.Names}}'),
       realNames: JSON.parse('{{.RealNames}}'),
       min: 0.2
-    }).start()
+    }).run()
   </script>
 </article>
 </body>
